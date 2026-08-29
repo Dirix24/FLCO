@@ -1,6 +1,6 @@
-# OpenSDR Explorer
+# FLCO
 
-OpenSDR Explorer es un proyecto educativo de **Software Defined Radio (SDR)** escrito en Python.
+FLCO Explorer es un proyecto educativo de **Software Defined Radio (SDR)** escrito en Python.
 
 Permite conectar un receptor compatible, visualizar el espectro de radio, mostrar una cascada (*waterfall*), cambiar la frecuencia y realizar un escaneo básico para localizar señales relativamente fuertes.
 
@@ -248,4 +248,4 @@ Crea un archivo `LICENSE` con la licencia que prefieras antes de publicar el rep
 
 ---
 
-**OpenSDR Explorer** — proyecto educativo de exploración del espectro mediante SDR.
+**FLCO** — proyecto educativo de exploración del espectro mediante SDR.
