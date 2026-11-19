@@ -14,12 +14,14 @@ FLCO es una aplicación **de código abierto** en desarrollo para escuchar emiso
 | Escuchar radio pública por Internet y guardar favoritos | Prototipo web | Depende del formato y disponibilidad del flujo |
 | Explorar noticias, deportes, música y radios españolas | Prototipo web | Clasificación orientativa del directorio |
 | Visualizar ondas y espectro del audio escuchado | Prototipo web | Solo cuando el navegador permite acceder a las muestras; **no es espectro RF** |
+| Ver canales de TV por país (1, 2, 3...) | Directorio de enlaces oficiales | Abre webs de canales; no garantiza vídeo directo ni incrustado |
+| Medir transferencia desde/hacia servidor FLCO | Prototipo web | Descarga local orientativa; subida requiere servidor POST; no equivale a velocidad de Internet |
 | Buscar fotografías y vídeos de noticias | Prototipo web | Archivos de Wikimedia Commons, **no TV en directo** |
 | Tiempo de respuesta HTTP | Prototipo web | No es velocidad de Internet ni ping ICMP |
 | Buscar radios próximas con permiso de ubicación | Prototipo web | Envía coordenadas a Radio Browser; requiere contexto seguro |
 | Espectro y waterfall de antena RTL-SDR | Script Python independiente | Necesita receptor USB, antena y controladores |
 
-**No implementado:** ver todos los canales de TV abiertos en directo, recibir audio FM desde la antena en la web, analizar interferencias RF reales en la web, medir velocidad de descarga/subida y controlar el SDR desde el teléfono. FLCO no puede detectar señales RF sin un receptor físico.
+**No implementado:** reproducción integrada de todos los canales de TV en directo, recibir audio FM desde la antena en la web, analizar interferencias RF reales en la web, prueba fiable de velocidad pública de Internet, servidor de subida compatible y controlar el SDR desde el teléfono. Los canales son enlaces oficiales a webs de sus proveedores, no retransmisiones propias. FLCO no puede detectar señales RF sin un receptor físico.
 
 ## Ejecutar en MX Linux
 
@@ -64,6 +66,7 @@ node --check web/app.js
 node --check web/lab.js
 node --check web/explore.js
 node --check web/live-media.js
+node --check web/channels.js
 ```
 
 Las comprobaciones de sintaxis no garantizan que todos los flujos, vídeos y navegadores funcionen. Falta probar manualmente las funciones nuevas en MX Linux.
@@ -75,3 +78,12 @@ Las búsquedas de radio consultan Radio Browser; la búsqueda multimedia consult
 ## Desarrollo
 
 El código fuente está disponible en [GitHub](https://github.com/Dirix24/FLCO). Consulta [la arquitectura](docs/ARCHITECTURE.md) y [la licencia MIT](LICENSE). Esta rama está destinada a revisión, sin fusiones automáticas.
+
+## Televisión por país y canales numerados
+Elige un país en **Televisión abierta y canales**. FLCO enumera enlaces a portales oficiales (Canal 1, 2, 3...), sin prometer que todos ofrezcan directo gratuito en cada región. La numeración es interna a FLCO, no frecuencia ni orden de TDT. Algunos portales requieren cuenta o están geobloqueados.
+
+## Datos de radio y errores de análisis
+FLCO presenta metadatos disponibles (categoría, país, códec, bitrate declarado y URL). Cuando el navegador impide capturar muestras por restricciones del flujo, **no inventa ondas ni interferencias**; la reproducción de audio puede seguir disponible. No se obtienen mediciones RF sin antena.
+
+## Velocidad
+La descarga de prueba mide una transferencia pequeña desde el servidor FLCO, con precisión limitada. La subida necesita un endpoint HTTP POST que el servidor Python simple no proporciona. **En localhost ninguna de estas cifras representa la velocidad real de Internet**. No se deben comparar con un test de velocidad público.
