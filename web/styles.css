@@ -2,3 +2,5 @@
 select{width:100%;font:inherit;background:#0e192b;color:white;border:1px solid #7184a0;border-radius:8px;padding:.7rem;min-height:44px}canvas{display:block;width:100%;height:auto;max-width:100%;margin-top:1rem;border:1px solid #41516b;border-radius:8px}button:disabled{opacity:.55;cursor:wait}
 
 input[type=range]{padding:0;accent-color:#55b9e6}#nearby-results{margin-top:1rem}
+
+.station-details{display:flex;flex-direction:column;gap:.25rem;min-width:0;overflow-wrap:anywhere}.station-details small{font-size:.8rem;color:#b3c3d7}#status{margin:.8rem 0;line-height:1.5}.panel form+.hint{margin-top:.75rem}
