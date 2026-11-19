@@ -1,11 +1,9 @@
-# FLCO Web — radio minimalista
+# FLCO Radio Web
 
-Interfaz responsive para móvil y MX Linux. Buscador único de radios, favoritos, reproducción de audio, metadatos de emisoras y gráficos del audio capturable por el navegador. Sin televisión ni paneles simulados.
+Radio web minimalista con resultados numerados, dial de barras azules decorativas, botones anterior/siguiente, información de emisoras, favoritos y reproducción de archivos locales sin Internet. No se muestra el visualizador de ondas que dependía de permisos de captura. Las barras del dial no miden ondas ni interferencias.
 
-`python3 -m http.server 8000 --directory web` y abrir `http://localhost:8000`.
+Iniciar desde la raíz: `python3 -m http.server 8000 --directory web` y abrir `http://localhost:8000`.
 
-El Service Worker guarda archivos básicos de la interfaz después de una primera visita online, para poder reabrirla sin conexión en navegadores compatibles. La escucha sin Internet usa archivos de audio locales, no emisoras remotas. Los favoritos no almacenan grabaciones. El audio de emisoras puede impedir su análisis por restricciones del navegador; nunca se inventan ondas. Para radio FM por antena se necesita un receptor RTL-SDR.
+El Service Worker guarda la interfaz tras una primera visita en HTTPS o localhost. Las radios online requieren Internet; los archivos locales no. El diseño es responsive para móviles, aunque la compatibilidad requiere pruebas. Consulta [README principal](../README.md) para instalación, desinstalación, antenas y limitaciones por sistema operativo.
 
-Licencia del código: [MIT](../LICENSE). Los medios de terceros mantienen sus propias licencias.
-
-Verificar sintaxis: `node --check web/app.js && node --check web/live-media.js && node --check web/offline.js && node --check web/sw.js`.
+Código abierto bajo [MIT](../LICENSE). Desarrollado con asistencia de IA.
