@@ -1,251 +1,124 @@
-# FLCO
+# FLCO — Radio inteligente y laboratorio de señales
 
-FLCO Explorer es un proyecto educativo de **Software Defined Radio (SDR)** escrito en Python.
+**FLCO** es un proyecto de código abierto en desarrollo para **buscar y escuchar emisoras de radio**, explorar señales con un receptor SDR y aprender sobre radiofrecuencia. Su objetivo es funcionar desde **ordenadores y teléfonos** mediante una interfaz web, con funciones de hardware disponibles cuando se conecte un receptor compatible.
 
-Permite conectar un receptor compatible, visualizar el espectro de radio, mostrar una cascada (*waterfall*), cambiar la frecuencia y realizar un escaneo básico para localizar señales relativamente fuertes.
+> **Estado: prototipo / desarrollo.** La interfaz de radio por Internet está implementada en la rama `feature/flco-radio-platform-phase-1`, pero su reproducción en navegadores y dispositivos reales todavía necesita validación. El explorador RTL-SDR existente continúa como módulo independiente. No existe aún una versión 1.0 estable.
 
-> ⚠️ Este proyecto está pensado para la experimentación y la recepción de emisiones que sean legalmente accesibles en tu jurisdicción.
+## Qué funciona hoy y qué está pendiente
 
-## Características
+| Función | Estado | Observaciones |
+| --- | --- | --- |
+| Búsqueda de emisoras por Internet | Prototipo | Directorio externo Radio Browser |
+| Reproducción de emisoras en navegador | Prototipo | Flujos HTTPS compatibles con HTML5; no todas las emisoras funcionarán |
+| Introducir una URL de audio | Prototipo | Solo enlaces HTTPS |
+| Favoritos | Prototipo | Guardados en el navegador local |
+| Interfaz adaptable a PC y móvil | Prototipo | Falta validación en dispositivos |
+| Espectro FFT y waterfall con RTL-SDR | MVP existente | Script Python independiente; requiere hardware |
+| Escaneo de frecuencias con RTL-SDR | MVP existente | Detecta niveles relativos, no identifica emisoras automáticamente |
+| Escuchar audio FM captado por RTL-SDR | Pendiente | La función de demodulación existente no constituye un reproductor completo |
+| Detección y análisis de interferencias | Pendiente | Se desarrollará con DSP y pruebas |
+| Velocidad de conexión y latencia | Pendiente | Distinta de la potencia de una señal de radio |
+| Emisoras sugeridas por ubicación | Pendiente | Consentimiento explícito y búsqueda manual alternativa |
+| Laboratorio de señales sintéticas | Pendiente | Generación digital local, sin transmisión por antena |
+| Conexión web segura al SDR del ordenador | Pendiente | API autenticada y permisos |
 
-- 📡 Soporte básico para RTL-SDR mediante `pyrtlsdr`
-- 📊 Visualización del espectro mediante FFT
-- 🌊 Waterfall o cascada de señales
-- 🔍 Detector básico de picos/señales
-- 🎚️ Cambio de frecuencia desde la consola
-- 🔎 Escaneo de un rango de frecuencias
-- 🐍 Implementación sencilla en Python
-- 📁 Código principal en un único archivo
+## Empezar sin antena: radio por Internet
 
-## Requisitos
-
-### Hardware
-
-Necesitas un receptor SDR compatible, por ejemplo:
-
-- RTL-SDR compatible con las librerías utilizadas
-
-### Software
-
-- Python 3.9 o superior recomendado
-- NumPy
-- Matplotlib
-- pyrtlsdr
-- SoundDevice (opcional para futuras funciones de audio)
-
-## Instalación
-
-Clona tu repositorio:
+Necesitas Python 3 para iniciar el servidor web local; **no necesitas RTL-SDR** para este modo.
 
 ```bash
-git clone TU_REPOSITORIO
-cd opensdr-explorer
+git clone https://github.com/Dirix24/FLCO.git
+cd FLCO
+git switch feature/flco-radio-platform-phase-1
+python -m http.server 8000 --directory web
 ```
 
-Crea un entorno virtual:
+En el ordenador, abre **http://localhost:8000**.
+
+Para usar un teléfono conectado a la misma red, abre `http://IP-LOCAL-DEL-ORDENADOR:8000`, sustituyendo el marcador por la dirección LAN del ordenador. Puede ser necesario permitir el acceso en el cortafuegos. **El servidor de desarrollo no debe exponerse a Internet.** Para un despliegue público se requiere un servidor HTTPS adecuado.
+
+Desde la interfaz puedes buscar emisoras, intentar reproducirlas, introducir un enlace de audio HTTPS y guardar favoritos. La disponibilidad de los resultados depende del directorio externo y de cada emisora.
+
+## Explorar frecuencias con antena: modo RTL-SDR existente
+
+Necesitas un receptor **RTL-SDR USB compatible**, antena y los controladores de tu sistema. Un ordenador o teléfono corriente no recibe FM por software si carece de receptor de radio compatible.
 
 ```bash
 python -m venv .venv
-```
-
-### Windows
-
-```bash
-.venv\Scripts\activate
-```
-
-### Linux / macOS
-
-```bash
+# Linux / macOS:
 source .venv/bin/activate
-```
-
-Instala las dependencias:
-
-```bash
-pip install numpy matplotlib pyrtlsdr sounddevice
-```
-
-También puedes utilizar el archivo `requirements.txt` incluido:
-
-```bash
+# Windows (PowerShell):
+# .venv\\Scripts\\Activate.ps1
 pip install -r requirements.txt
-```
-
-## Ejecución
-
-Conecta tu receptor SDR y ejecuta:
-
-```bash
 python opensdr_explorer.py
 ```
 
-## Comandos
-
-### Cambiar frecuencia
+Comandos de la consola del explorador:
 
 ```text
 freq 100.5
-```
-
-Esto intenta sintonizar 100.5 MHz.
-
-### Escanear un rango
-
-```text
 scan 88 108
-```
-
-Realiza un escaneo básico entre 88 MHz y 108 MHz y muestra las señales con mayor potencia relativa.
-
-### Ayuda
-
-```text
 help
-```
-
-### Salir
-
-```text
 quit
 ```
 
-## Estructura del proyecto
+Este módulo representa espectros y busca picos de potencia. **No reproduce todavía el audio de las emisoras FM recibidas por antena.** Sus mejoras de estabilidad están propuestas por separado en el [PR #1](https://github.com/Dirix24/FLCO/pull/1).
+
+## Estructura actual
 
 ```text
-opensdr-explorer/
-│
-├── opensdr_explorer.py
-├── requirements.txt
-├── README.md
-├── LICENSE
-└── .gitignore
+FLCO/
+├── opensdr_explorer.py       # MVP SDR original (Python)
+├── requirements.txt          # Dependencias del MVP SDR
+├── web/
+│   ├── index.html            # Interfaz de radio por Internet
+│   ├── styles.css
+│   ├── app.js
+│   └── README.md             # Instrucciones de la interfaz
+├── docs/
+│   └── ARCHITECTURE.md       # Diseño modular y fases
+└── .github/workflows/
+    └── web-checks.yml        # Comprobación de sintaxis JavaScript
 ```
 
-## Funcionamiento
+## Plan de desarrollo
 
-El programa recibe muestras IQ desde el dispositivo SDR.
+1. **Radio por Internet:** búsqueda, reproducción, favoritos y experiencia móvil.
+2. **Radio por antena:** estabilizar el SDR, añadir demodulación y audio FM real.
+3. **Espectro e interferencias:** mediciones de ruido, señales y ocupación de bandas.
+4. **Conexión:** velocidad, latencia y estabilidad de Internet; métricas inalámbricas solo cuando el dispositivo lo permita.
+5. **Ubicación opcional:** emisoras por ciudad o geolocalización consentida; la proximidad no garantiza recepción.
+6. **Laboratorio:** señales digitales sintéticas, tonos, AM/FM simulada y visualización.
+7. **Integración y versión estable:** API local autenticada, pruebas con hardware y navegadores, empaquetado y documentación.
 
-Después:
+Consulta [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) para los detalles técnicos y criterios de aceptación.
 
-1. Se aplica una ventana.
-2. Se calcula una FFT.
-3. Se convierte el resultado a una escala logarítmica aproximada.
-4. Se representa el espectro.
-5. Se añaden las nuevas líneas al waterfall.
-6. Se buscan picos por encima de un umbral relativo.
+## Comprobaciones
 
-## Limitaciones actuales
+Para la interfaz web:
 
-Este proyecto es un MVP educativo. Todavía puede mejorarse en varios aspectos:
-
-- Mejor interfaz gráfica con PySide6.
-- Controles visuales para frecuencia y ganancia.
-- Selección de dispositivo SDR.
-- Escáner no bloqueante.
-- Mejor detección de señales.
-- Configuración persistente.
-- Lista de favoritos.
-- Grabación de datos IQ para experimentación.
-- Soporte adicional mediante SoapySDR.
-- Procesamiento DSP más avanzado para formatos abiertos compatibles.
-
-## Posibles mejoras
-
-Una futura versión podría incluir:
-
-```text
-┌──────────────────────────────────────────────┐
-│ OpenSDR Explorer                             │
-├──────────────────────────────────────────────┤
-│ Dispositivo: [ RTL-SDR ▼ ]                   │
-│ Frecuencia: [ 100.500 MHz ] [ Sintonizar ]   │
-│ Ganancia:    [ Auto ▼ ]                      │
-├──────────────────────────────────────────────┤
-│                                              │
-│              ESPECTRO                        │
-│                                              │
-├──────────────────────────────────────────────┤
-│              WATERFALL                       │
-│                                              │
-├──────────────────────────────────────────────┤
-│ Señales detectadas                           │
-│ • 99.500 MHz                                 │
-│ • 100.500 MHz                                │
-│ • 101.700 MHz                                │
-└──────────────────────────────────────────────┘
+```bash
+node --check web/app.js
 ```
 
-## Solución de problemas
+Para comprobar manualmente el reproductor, inicia el servidor web, busca una emisora, prueba el audio y verifica los favoritos en un navegador de escritorio y otro móvil. La comprobación de sintaxis **no demuestra** que el audio funcione.
 
-### No se detecta el RTL-SDR
+## Privacidad, legalidad y límites
 
-Comprueba:
+- La fase web actual **no solicita ubicación**. Una futura función de ubicación deberá pedir permiso y permitir introducir la ciudad manualmente.
+- Los favoritos se guardan en el almacenamiento local del navegador, sin cuenta ni sincronización.
+- La búsqueda consulta un directorio de terceros; el navegador puede conectar directamente con las emisoras elegidas.
+- No se debe acceder a comunicaciones privadas o protegidas sin autorización.
+- **Generar señales sintéticas no equivale a transmitir radiofrecuencia.** FLCO no transmite por antena.
+- Las mediciones de velocidad de Internet no son mediciones de intensidad de radio.
+- Las frecuencias y la recepción real dependen del hardware, la antena, el entorno y la normativa aplicable.
 
-- Que el dispositivo está conectado.
-- Que el sistema operativo reconoce el dispositivo.
-- Que los controladores necesarios están instalados.
-- Que ninguna otra aplicación está utilizando el SDR.
+## Desarrollo y contribuciones
 
-### Error al instalar pyrtlsdr
+La implementación de radio por Internet se revisa en el [PR #2](https://github.com/Dirix24/FLCO/pull/2), que permanece **en borrador**. Los cambios no deben fusionarse hasta superar las pruebas y la revisión técnica.
 
-En algunos sistemas necesitas instalar previamente las bibliotecas y controladores de RTL-SDR.
-
-Consulta la documentación de tu sistema operativo y del fabricante del hardware para realizar una instalación compatible.
-
-### El gráfico funciona lentamente
-
-Puedes reducir:
-
-```python
-FFT_SIZE = 4096
-```
-
-Por ejemplo:
-
-```python
-FFT_SIZE = 2048
-```
-
-También puedes aumentar el intervalo de actualización:
-
-```python
-interval=250
-```
-
-## Uso responsable
-
-El software SDR puede recibir muchas clases de emisiones dependiendo del hardware y de la legislación local.
-
-Este proyecto no está diseñado para:
-
-- Romper cifrado.
-- Eludir mecanismos de seguridad.
-- Obtener acceso a comunicaciones protegidas.
-- Interferir, transmitir o bloquear comunicaciones.
-
-Utiliza el proyecto únicamente de acuerdo con las leyes y regulaciones aplicables.
-
-## Contribuciones
-
-Las mejoras y contribuciones son bienvenidas.
-
-Ideas especialmente interesantes:
-
-- Mejor interfaz gráfica.
-- Mejor rendimiento.
-- Soporte para más dispositivos SDR.
-- Tests automatizados.
-- Documentación.
-- Mejor detector de señales.
-- Procesamiento de señales abiertas y legalmente accesibles.
+Si quieres contribuir, abre un issue con el problema, los pasos para reproducirlo, tu sistema operativo y el hardware SDR si corresponde.
 
 ## Licencia
 
-Puedes utilizar una licencia MIT para un proyecto abierto y sencillo.
-
-Crea un archivo `LICENSE` con la licencia que prefieras antes de publicar el repositorio.
-
----
-
-**FLCO** — proyecto educativo de exploración del espectro mediante SDR.
+**Pendiente de confirmar por el titular del repositorio.** No se debe asumir una licencia MIT ni ninguna otra sin comprobar que existe un archivo de licencia válido en el proyecto.
