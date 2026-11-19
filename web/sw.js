@@ -1,6 +1,6 @@
 "use strict";
-const CACHE="flco-radio-shell-v2";
-const FILES=["./","./index.html","./styles.css","./app.js","./dial.js","./offline.js"];
+const CACHE="flco-radio-shell-v3";
+const FILES=["./","./index.html","./styles.css","./app.js","./dial.js","./explore.js","./offline.js"];
 self.addEventListener("install",event=>{
  event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)).then(()=>self.skipWaiting()));
 });
