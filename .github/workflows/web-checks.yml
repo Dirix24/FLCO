@@ -20,4 +20,5 @@ jobs:
       - run: node --check web/lab.js
       - run: node --check web/explore.js
       - run: node --check web/live-media.js
-      - run: node --check web/channels.js
+      - run: node --check web/offline.js
+      - run: node --check web/sw.js
