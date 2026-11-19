@@ -11,6 +11,8 @@ FLCO es un proyecto en desarrollo para **escuchar emisoras por Internet** desde 
 | Buscar emisoras por país, tema o nombre en un solo campo | Prototipo web | Internet; directorio externo Radio Browser |
 | Escuchar emisoras y URL de audio HTTPS | Prototipo web | Navegador compatible con el flujo |
 | Guardar favoritos | Prototipo web | Almacenamiento local del navegador |
+| Reproducir tonos de prueba en altavoces | Prototipo web | Audio real generado por Web Audio, no RF |
+| Explorar canales públicos por Noticias, Deportes, Música o España | Prototipo web | Directorio Radio Browser; enlaces pueden fallar |
 | Generar ondas de prueba (seno, cuadrada, AM y ruido) | Prototipo web | Sin antena; no transmite RF |
 | Espectro e interferencia simulados | Prototipo web | Datos matemáticos, no medición SDR |
 | Buscar emisoras por país o proximidad | Prototipo web | Geolocalización solo con permiso; directorio externo |
@@ -138,3 +140,6 @@ Consulta el archivo `LICENSE` del repositorio, si está presente, para conocer l
 
 ### Buscador único
 El buscador interpreta países y categorías habituales (noticias, deportes, música y géneros). Usa etiquetas de Radio Browser: la clasificación no está verificada y puede faltar. Las búsquedas de términos no reconocidos se tratan como nombres de emisoras.
+
+## Escuchar un tono real y explorar canales abiertos
+En la web, selecciona una onda **senoidal** o **cuadrada** y pulsa **Escuchar tono de prueba**. El navegador emite sonido por los altavoces a volumen reducido, sin usar antena ni transmitir RF. Pulsa **Detener tono** para silenciarlo. La onda AM y el ruido continúan solo como visualización. En **Explorar radios abiertas** pulsa Noticias, Deportes, Música o Todas para consultar emisoras públicas por Internet. No es recepción FM con antena. Para recibir FM real hará falta integrar un receptor RTL-SDR y una cadena de demodulación y audio.
