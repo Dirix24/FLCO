@@ -7,6 +7,7 @@
 <title>FLCO Radio</title>
 <link rel="stylesheet" href="styles.css">
 <script src="app.js" defer></script>
+<script src="lab.js" defer></script>
 </head>
 <body>
 <header><h1>📻 FLCO Radio</h1><p>Emisoras abiertas, desde tu ordenador o teléfono</p></header>
@@ -30,7 +31,24 @@
 <button type="submit">Reproducir URL</button></form>
 </section>
 <section class="panel"><h2>Favoritos</h2><ul id="favorites" class="stations"></ul></section>
-<section class="panel"><h2>Próximas funciones</h2><p>Escaneo RTL-SDR · Interferencias · Conexión · Ubicación voluntaria · Laboratorio de señales</p><p class="hint">Estas funciones aún no están implementadas en la interfaz web.</p></section>
+<section class="panel">
+<h2>Laboratorio de señales simuladas</h2>
+<p class="hint">Genera una señal digital de prueba y visualiza su forma de onda. No emite radiofrecuencia ni utiliza antena.</p>
+<label for="waveform">Tipo de señal</label>
+<select id="waveform"><option value="sine">Senoidal</option><option value="square">Cuadrada</option><option value="am">AM simulada</option><option value="noise">Ruido</option></select>
+<label for="signal-frequency">Frecuencia de prueba (Hz)</label>
+<input id="signal-frequency" type="number" min="10" max="2000" step="10" value="440">
+<button id="generate-signal" type="button">Generar señal</button>
+<canvas id="signal-canvas" width="760" height="220" role="img" aria-label="Gráfico de forma de onda simulada"></canvas>
+<p id="signal-info" role="status" aria-live="polite">Selecciona un tipo de señal y pulsa Generar.</p>
+</section>
+<section class="panel">
+<h2>Comprobar respuesta de conexión</h2>
+<p class="hint">Mide el tiempo de una petición HTTP al servidor que aloja esta página. No es una prueba de velocidad de descarga/subida ni un ping ICMP. En localhost mide principalmente la comunicación local.</p>
+<button id="test-latency" type="button">Medir respuesta HTTP</button>
+<p id="latency-info" role="status" aria-live="polite">Prueba sin iniciar.</p>
+</section>
+<section class="panel"><h2>Próximas funciones</h2><p>Audio FM RTL-SDR · Interferencias reales · Velocidad de descarga/subida · Ubicación voluntaria · API segura de SDR</p><p class="hint">Estas funciones aún no están implementadas en la interfaz web.</p></section>
 </main>
 <footer>FLCO · Solo recepción de emisiones públicas y accesibles legalmente · La ubicación no se solicita en esta fase</footer>
 </body></html>
