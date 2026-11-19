@@ -9,3 +9,5 @@ El Service Worker guarda la interfaz tras una primera visita en HTTPS o localhos
 Código abierto bajo [MIT](../LICENSE). Desarrollado con asistencia de IA.
 
 La interfaz usa fondo negro. **Radios cerca de mí** solicita ubicación únicamente tras pulsar el botón; obtiene el país mediante OpenStreetMap Nominatim y consulta emisoras de ese país en Radio Browser. No mide cobertura ni intensidad RF. La geolocalización requiere HTTPS o localhost.
+
+El catálogo mundial y las búsquedas por país usan paginación de Radio Browser: muestran 60 emisoras por tanda y permiten cargar más hasta que el directorio no devuelva nuevos resultados. No se limita a 30 emisoras.
