@@ -16,6 +16,7 @@ pip install numpy matplotlib pyrtlsdr sounddevice
 
 import sys
 import threading
+import math
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -35,16 +36,18 @@ WATERFALL_LINES = 150
 
 sdr = None
 running = True
+sdr_lock = threading.RLock()
 waterfall = np.zeros((WATERFALL_LINES, FFT_SIZE), dtype=np.float32)
 
 def connect_sdr():
     global sdr
     print("[+] Conectando RTL-SDR...")
     try:
-        sdr = RtlSdr()
-        sdr.sample_rate = SAMPLE_RATE
-        sdr.center_freq = CENTER_FREQUENCY
-        sdr.gain = GAIN
+        with sdr_lock:
+            sdr = RtlSdr()
+            sdr.sample_rate = SAMPLE_RATE
+            sdr.center_freq = CENTER_FREQUENCY
+            sdr.gain = GAIN
         print("[+] RTL-SDR conectado")
         print(f"[+] Frecuencia: {CENTER_FREQUENCY / 1e6:.3f} MHz")
     except Exception as e:
@@ -56,7 +59,8 @@ def read_samples():
     if sdr is None:
         return None
     try:
-        return sdr.read_samples(FFT_SIZE)
+        with sdr_lock:
+            return sdr.read_samples(FFT_SIZE)
     except Exception as e:
         print("Error leyendo SDR:", e)
         return None
@@ -69,11 +73,7 @@ def calculate_spectrum(samples):
     return 20 * np.log10(np.abs(spectrum) + 1e-12)
 
 def get_frequency_axis():
-    return np.linspace(
-        CENTER_FREQUENCY - SAMPLE_RATE / 2,
-        CENTER_FREQUENCY + SAMPLE_RATE / 2,
-        FFT_SIZE
-    ) / 1e6
+    return (CENTER_FREQUENCY + np.fft.fftshift(np.fft.fftfreq(FFT_SIZE, d=1 / SAMPLE_RATE))) / 1e6
 
 def detect_signals(spectrum):
     average = np.mean(spectrum)
@@ -93,34 +93,58 @@ def detect_signals(spectrum):
 def fm_demodulate(samples):
     return np.diff(np.unwrap(np.angle(samples)))
 
+def validate_frequency(mhz):
+    value = float(mhz)
+    if not math.isfinite(value) or not 24 <= value <= 1766:
+        raise ValueError("Frecuencia fuera del rango RTL-SDR habitual (24-1766 MHz)")
+    return value * 1e6
+
+
 def set_frequency(mhz):
     global CENTER_FREQUENCY
     try:
-        freq = float(mhz) * 1e6
-        CENTER_FREQUENCY = freq
-        sdr.center_freq = freq
+        freq = validate_frequency(mhz)
+        with sdr_lock:
+            if sdr is None:
+                raise RuntimeError("No hay un receptor conectado")
+            sdr.center_freq = freq
+            CENTER_FREQUENCY = freq
         print(f"[+] Nueva frecuencia: {freq / 1e6:.3f} MHz")
-    except Exception as e:
+    except (ValueError, RuntimeError, OSError) as e:
         print("Error cambiando frecuencia:", e)
 
+
 def scan_range(start_mhz, end_mhz, step_khz=100):
+    global CENTER_FREQUENCY
+    start = validate_frequency(start_mhz)
+    end = validate_frequency(end_mhz)
+    step = float(step_khz) * 1e3
+    if not math.isfinite(step) or step <= 0 or start > end:
+        raise ValueError("Rango o paso de escaneo inválido")
+    count = int((end - start) // step) + 1
+    if count > 10000:
+        raise ValueError("Demasiados pasos de escaneo (máximo 10000)")
+    if sdr is None:
+        raise RuntimeError("No hay un receptor conectado")
+
     print(f"\n[SCAN] {start_mhz} MHz -> {end_mhz} MHz")
-    frequencies = np.arange(start_mhz * 1e6, end_mhz * 1e6, step_khz * 1e3)
     results = []
-
-    for frequency in frequencies:
-        if not running:
-            break
+    with sdr_lock:
+        previous = CENTER_FREQUENCY
         try:
-            sdr.center_freq = frequency
-            samples = read_samples()
-            if samples is not None:
-                power = np.mean(np.abs(samples) ** 2)
-                results.append((frequency / 1e6, power))
-        except Exception as e:
-            print(e)
+            for index in range(count):
+                if not running:
+                    break
+                frequency = start + index * step
+                sdr.center_freq = frequency
+                samples = sdr.read_samples(FFT_SIZE)
+                if samples is not None and len(samples):
+                    power = float(np.mean(np.abs(samples) ** 2))
+                    results.append((frequency / 1e6, power))
+        finally:
+            sdr.center_freq = previous
 
-    results.sort(key=lambda x: x[1], reverse=True)
+    results.sort(key=lambda item: item[1], reverse=True)
     print("\n===== SEÑALES MÁS FUERTES =====")
     for freq, power in results[:10]:
         print(f"{freq:.4f} MHz Power: {power:.6f}")
@@ -206,7 +230,6 @@ quit             Salir
 
             elif parts[0] == "quit":
                 running = False
-                plt.close()
                 break
 
             else:
@@ -214,7 +237,6 @@ quit             Salir
 
         except KeyboardInterrupt:
             running = False
-            plt.close()
             break
         except Exception as e:
             print("Error:", e)
@@ -240,7 +262,8 @@ def main():
         running = False
         if sdr:
             try:
-                sdr.close()
+                with sdr_lock:
+                    sdr.close()
             except Exception:
                 pass
         print("OpenSDR Explorer cerrado")
