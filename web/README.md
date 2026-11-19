@@ -36,3 +36,6 @@ Revisar manualmente búsqueda, reproducción, errores de red, favoritos, navegac
 
 ## Buscador único
 Escribe «España», «noticias de España», «deportes» o «rock México» en el mismo campo. FLCO interpreta países y géneros comunes y muestra la categoría según las etiquetas del directorio externo, que pueden ser incompletas o erróneas. Para búsquedas no reconocidas se busca por nombre de emisora. El ruido simulado no tiene frecuencia tonal.
+
+## Audio real y canales abiertos
+La onda senoidal o cuadrada puede reproducirse por los altavoces mediante Web Audio (volumen bajo, inicio mediante clic y botón Detener). Esto **no** es recepción RF. Los botones Noticias, Deportes, Música y Todas consultan el directorio externo de emisoras por Internet. No hay canales de TV ni exploración SDR real en el navegador.
