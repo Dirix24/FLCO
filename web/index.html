@@ -9,6 +9,7 @@
 <script src="app.js" defer></script>
 <script src="lab.js" defer></script>
 <script src="explore.js" defer></script>
+<script src="audio-lab.js" defer></script>
 </head>
 <body>
 <header><h1>📻 FLCO Radio</h1><p>Emisoras abiertas, desde tu ordenador o teléfono</p></header>
@@ -19,6 +20,7 @@
 <p class="hint">Los resultados dependen de un directorio externo. Las emisoras pueden cambiar o dejar de emitir.</p>
 <div id="status" role="status" aria-live="polite"></div>
 <ul id="results" class="stations"></ul>
+<h3>Explorar radios abiertas</h3><p class="hint">Canales de audio públicos por Internet. No son frecuencias captadas por antena.</p><div class="horizontal browse-actions"><button type="button" data-browse="news">Noticias</button><button type="button" data-browse="sports">Deportes</button><button type="button" data-browse="music">Música</button><button type="button" data-browse="all">Todas</button></div>
 </section>
 <section class="panel">
 <h2>Reproductor</h2><p id="now-playing">Sin emisora seleccionada</p>
@@ -41,7 +43,7 @@
 <input id="signal-frequency" type="number" min="10" max="2000" step="10" value="440">
 <button id="generate-signal" type="button">Generar señal</button>
 <canvas id="signal-canvas" width="760" height="220" role="img" aria-label="Gráfico de forma de onda simulada"></canvas>
-<p id="signal-info" role="status" aria-live="polite">Selecciona un tipo de señal y pulsa Generar.</p>
+<p id="signal-info" role="status" aria-live="polite">Selecciona un tipo de señal y pulsa Generar.</p><p class="hint">Puedes escuchar el tono generado por el ordenador. Esto produce audio real en los altavoces, pero NO recibe radiofrecuencia.</p><button type="button" id="play-tone">Escuchar tono de prueba</button> <button type="button" id="stop-tone">Detener tono</button><p id="tone-info" role="status" aria-live="polite">Audio de prueba detenido.</p>
 </section>
 <section class="panel">
 <h2>Comprobar respuesta de conexión</h2>
