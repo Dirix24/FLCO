@@ -33,3 +33,6 @@ node --check web/explore.js
 python -m unittest discover -s tests -v
 ```
 Revisar manualmente búsqueda, reproducción, errores de red, favoritos, navegación por teclado y visualización en móvil. Estas comprobaciones deben realizarse antes de declarar estable la fase 1.
+
+## Buscador único
+Escribe «España», «noticias de España», «deportes» o «rock México» en el mismo campo. FLCO interpreta países y géneros comunes y muestra la categoría según las etiquetas del directorio externo, que pueden ser incompletas o erróneas. Para búsquedas no reconocidas se busca por nombre de emisora. El ruido simulado no tiene frecuencia tonal.
