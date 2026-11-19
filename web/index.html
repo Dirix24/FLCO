@@ -1,88 +1,42 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#101827">
-<title>FLCO Radio</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101827"><title>FLCO · Radio de código libre</title>
 <link rel="stylesheet" href="styles.css">
-<script src="app.js" defer></script>
-<script src="lab.js" defer></script>
-<script src="explore.js" defer></script>
-<script src="live-media.js" defer></script>
-<script src="channels.js" defer></script>
+<script src="app.js" defer></script><script src="live-media.js" defer></script><script src="offline.js" defer></script>
 </head>
 <body>
-<header><h1>📻 FLCO Radio</h1><p>Emisoras abiertas, desde tu ordenador o teléfono</p></header>
+<header class="topbar"><button id="back-button" type="button" aria-label="Volver a la página anterior">← Volver</button><div><h1>📻 FLCO Radio</h1><p>Radio de código abierto · MIT</p></div><span id="connection-state" role="status">Comprobando conexión…</span></header>
 <main>
 <section class="panel">
-<h2>Buscar emisoras</h2>
-<form id="search-form"><label for="query">¿Qué radio quieres escuchar?</label><div class="horizontal"><input id="query" type="search" placeholder="Noticias de España, deportes, música, España..." required maxlength="100" autocomplete="off"><button type="submit">Buscar radios</button></div></form><p class="hint">Escribe el nombre de un país, una emisora o un tema. Por ejemplo: «México», «noticias», «deportes», «rock».</p>
-<p class="hint">Los resultados dependen de un directorio externo. Las emisoras pueden cambiar o dejar de emitir.</p>
-<div id="status" role="status" aria-live="polite"></div>
-<ul id="results" class="stations"></ul>
-<h3>Explorar radios abiertas</h3><p class="hint">Canales de audio públicos por Internet. No son frecuencias captadas por antena.</p><div class="horizontal browse-actions"><button type="button" data-browse="news">Noticias</button><button type="button" data-browse="sports">Deportes</button><button type="button" data-browse="music">Música</button><button type="button" data-browse="all">Todas</button></div>
+<h2>Buscar radios</h2>
+<form id="search-form"><label for="query">País, noticias, música, deportes o nombre</label><div class="horizontal"><input id="query" type="search" placeholder="México, noticias, jazz..." maxlength="100" required><button type="submit">Buscar</button></div></form>
+<p class="hint">Las emisoras se escuchan por Internet. Puedes elegir cualquier país escribiendo su nombre.</p>
+<div id="status" role="status" aria-live="polite"></div><ul id="results" class="stations"></ul>
 </section>
-<section class="panel">
-<h2>Televisión abierta y canales</h2>
-<p class="hint">Selecciona un país y consulta canales oficiales numerados. Los canales pueden abrir su web de emisión en directo; no se garantiza que todos permitan vídeo incrustado o acceso desde cualquier país. No son señales captadas por antena.</p>
-<label for="tv-country">País</label>
-<select id="tv-country"><option value="">Selecciona un país</option><option value="ES">España</option><option value="MX">México</option><option value="AR">Argentina</option><option value="CO">Colombia</option><option value="CL">Chile</option><option value="PE">Perú</option><option value="FR">Francia</option><option value="GB">Reino Unido</option></select>
-<div id="tv-channels" class="channel-grid"></div>
-<p id="tv-status" role="status" aria-live="polite">Elige un país para ver canales.</p>
-</section>
-<section class="panel">
-<h2>Reproductor</h2><p id="now-playing">Sin emisora seleccionada</p>
+<section class="panel" id="listen-panel">
+<h2>Escuchar</h2><p id="now-playing">Selecciona una emisora o un archivo local</p>
 <audio id="player" controls preload="none"></audio>
-<p class="hint">Algunas emisoras usan formatos que tu navegador no puede reproducir.</p>
+<p id="station-details" class="hint">Aquí verás la información de la radio seleccionada.</p>
+<h3>Ondas del sonido</h3>
+<p class="hint">Visualización matemática de muestras reales del audio cuando el navegador permite capturarlas. No mide interferencias de antena ni inventa ondas.</p>
+<button id="start-visualizer" type="button">Ver ondas</button><button id="stop-visualizer" type="button" class="secondary">Detener gráfico</button>
+<canvas id="live-wave" width="760" height="160" role="img" aria-label="Forma de onda del audio"></canvas>
+<canvas id="live-spectrum" width="760" height="160" role="img" aria-label="Frecuencias del audio"></canvas>
+<p id="live-info" role="status" aria-live="polite">Selecciona una radio y pulsa Ver ondas.</p>
 </section>
 <section class="panel">
-<h2>Escuchar una URL propia</h2>
-<form id="url-form"><label for="station-name">Nombre</label><input id="station-name" maxlength="100" placeholder="Mi emisora" required>
-<label for="station-url">Enlace directo de audio HTTPS</label><input id="station-url" type="url" placeholder="https://ejemplo.org/radio.mp3" required>
-<button type="submit">Reproducir URL</button></form>
+<h2>Sin Internet</h2>
+<p class="hint">Puedes abrir FLCO sin conexión después de cargarla una vez en este navegador. Para escuchar sin Internet, elige un archivo de audio que tengas en el dispositivo. Las emisoras de Internet y los favoritos necesitan conexión para reproducirse.</p>
+<label for="offline-file">Abrir audio del dispositivo</label>
+<input id="offline-file" type="file" accept="audio/*">
+<p id="offline-info" role="status" aria-live="polite">Ningún archivo seleccionado.</p>
 </section>
 <section class="panel"><h2>Favoritos</h2><ul id="favorites" class="stations"></ul></section>
-<section class="panel">
-<h2>Ondas del audio que estás escuchando</h2>
-<p class="hint">Gráfico del audio real reproducido por el navegador cuando el flujo permite acceder a sus muestras. No mide radiofrecuencia, potencia de antena, interferencias RF ni calidad de cobertura.</p>
-<button id="start-visualizer" type="button">Ver ondas del audio</button>
-<button id="stop-visualizer" type="button">Detener gráfico</button>
-<canvas id="live-wave" width="760" height="180" role="img" aria-label="Forma de onda del audio recibido"></canvas>
-<canvas id="live-spectrum" width="760" height="180" role="img" aria-label="Espectro del audio recibido"></canvas>
-<p id="live-info" role="status" aria-live="polite">Algunas radios bloquean el análisis de audio. Si ocurre, el reproductor seguirá disponible y podrás ver datos de la emisora.</p><p id="station-details" class="hint">Selecciona una emisora para ver sus datos disponibles.</p>
-</section>
-<section class="panel">
-<h2>Noticias: imágenes y vídeos abiertos</h2>
-<p class="hint">Busca archivos multimedia publicados en Wikimedia Commons. Son materiales disponibles públicamente, no una emisión de televisión en directo ni todos los canales existentes. Comprueba la licencia de cada archivo antes de reutilizarlo.</p>
-<form id="media-search"><label for="media-query">Buscar imágenes o vídeos</label><div class="horizontal"><input id="media-query" maxlength="100" value="noticias España" required><button type="submit">Buscar medios</button></div></form>
-<p id="media-status" role="status" aria-live="polite">Introduce una búsqueda.</p>
-<div id="media-results" class="media-results"></div>
-</section>
-<section class="panel">
-<h2>Comprobar respuesta de conexión</h2>
-<p class="hint">Mide el tiempo de una petición HTTP al servidor que aloja esta página. No es una prueba de velocidad de descarga/subida ni un ping ICMP. En localhost mide principalmente la comunicación local.</p>
-<button id="test-latency" type="button">Medir respuesta HTTP</button>
-<p id="latency-info" role="status" aria-live="polite">Prueba sin iniciar.</p>
-</section>
-<section class="panel">
-<h2>Emisoras según tu zona (opcional)</h2>
-<p class="hint">Puedes buscar emisoras por país desde el buscador superior. Si permites usar tu ubicación, FLCO consultará el directorio público por proximidad. La ubicación no se guarda en FLCO; el proveedor externo recibirá las coordenadas de la búsqueda. Encontrar una emisora cercana no garantiza recepción FM.</p>
-<button type="button" id="nearby-stations">Buscar usando mi ubicación</button>
-<p id="nearby-info" role="status" aria-live="polite">Ubicación desactivada.</p>
-<ul id="nearby-results" class="stations"></ul>
-</section>
-<section class="panel">
-<h2>Prueba de descarga y subida</h2>
-<p class="hint">Prueba voluntaria de transferencia de datos con el servidor FLCO. Si lo ejecutas en localhost, mide el enlace local, NO la velocidad de Internet. La subida requiere un servidor compatible; el servidor Python básico no acepta POST.</p>
-<button id="test-download" type="button">Medir descarga</button>
-<button id="test-upload" type="button">Medir subida</button>
-<p id="speed-info" role="status" aria-live="polite">Sin mediciones.</p>
-</section>
-<section class="panel"><h2>Receptor RTL-SDR (hardware)</h2>
-<p>FM por antena, interferencias RF y conexión segura con el receptor requieren un RTL-SDR USB y un servicio local de recepción. El servidor web básico no controla el hardware.</p>
-<p id="sdr-status" role="status">SDR no conectado. La recepción real no está disponible desde esta página.</p>
-</section>
+<details class="panel"><summary>Opciones adicionales</summary>
+<form id="url-form"><label for="station-name">Nombre de la radio</label><input id="station-name" maxlength="100" placeholder="Mi radio" required><label for="station-url">Enlace de audio HTTPS</label><input id="station-url" type="url" placeholder="https://ejemplo.org/radio.mp3" required><button type="submit">Escuchar enlace</button></form>
+</details>
 </main>
-<footer>FLCO · Solo recepción de emisiones públicas y accesibles legalmente · La ubicación solo se solicita si pulsas el botón correspondiente</footer>
+<footer>FLCO · Software libre bajo licencia <a href="../LICENSE">MIT</a> · La recepción FM sin Internet requiere hardware compatible.</footer>
 </body></html>
