@@ -125,54 +125,100 @@ function category(station) {
   if (tags.some(t => ["music","musica","pop","rock","jazz","classical","electronic","dance"].includes(t))) return "Música";
   return "Sin categoría confirmada";
 }
+const PAGE_SIZE = 100;
+const DISPLAY_BATCH = 60;
 let currentRequest;
-$("search-form").addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const query = clean($("query").value);
-  if (!query) return;
-  if (currentRequest) currentRequest.abort();
-  const request = new AbortController();
-  currentRequest = request;
+let searchState = null;
+let loadingMore = false;
+const seenStreams = new Set();
+function renderMore() {
   const target = $("results");
-  target.replaceChildren();
-  status("Buscando emisoras...");
-  const {country, topic, name} = interpretQuery(query);
+  const start = target.children.length;
+  const next = stationList.slice(start,start+DISPLAY_BATCH);
+  next.forEach((s,i)=>stationRow(s,target,false,start+i+1));
+  $("more-stations").hidden = !searchState || (target.children.length>=stationList.length && searchState.exhausted);
+  const scope = searchState?.label || "radios";
+  status(stationList.length ? `${stationList.length} emisoras encontradas · ${target.children.length} mostradas · ${scope}. Usa «Cargar más radios» para continuar.` : "No hay emisoras HTTPS compatibles en esta búsqueda.");
+}
+async function loadPage() {
+  if (!searchState || loadingMore) return;
+  loadingMore = true;
+  const more = $("more-stations");
+  more.disabled = true;
+  const state = searchState;
+  const request = state.controller;
   try {
-    // Radio Browser permite filtrar por país y etiqueta; probamos etiquetas alternativas.
-    const tags = topic ? topic.tags : [""];
-    const unique = new Map();
-    for (const tag of tags) {
+    if (state.exhausted) {renderMore();return;}
+    // Consultar varias páginas hasta encontrar emisoras nuevas o agotar el directorio.
+    let attempts = 0;
+    while (attempts++ < 3 && stationList.length - $("results").children.length < DISPLAY_BATCH && !state.exhausted) {
+      const tag = state.tags[state.tagIndex];
       const url = new URL(DIRECTORY);
-      if (country) url.searchParams.set("country", country);
-      if (tag) url.searchParams.set("tag", tag);
-      if (name) url.searchParams.set("name", name);
-      url.searchParams.set("hidebroken", "true");
-      url.searchParams.set("limit", "100");
-      url.searchParams.set("order", "votes");
-      url.searchParams.set("reverse", "true");
-      const response = await fetch(url, {signal: request.signal, headers: {"Accept": "application/json"}});
-      if (!response.ok) throw new Error("Servicio no disponible");
+      if(state.country) url.searchParams.set("country",state.country);
+      if(state.countrycode) url.searchParams.set("countrycode",state.countrycode);
+      if(tag) url.searchParams.set("tag",tag);
+      if(state.name) url.searchParams.set("name",state.name);
+      url.searchParams.set("hidebroken","true");
+      url.searchParams.set("limit",String(PAGE_SIZE));
+      url.searchParams.set("offset",String(state.offset));
+      url.searchParams.set("order","votes");
+      url.searchParams.set("reverse","true");
+      const response = await fetch(url,{signal:request.signal,headers:{Accept:"application/json"}});
+      if(!response.ok) throw new Error("Servicio no disponible");
       const stations = await response.json();
-      if (!Array.isArray(stations)) throw new Error("Respuesta inesperada");
-      for (const s of stations) {
-        const url = safeStream(s.url_resolved || s.url);
-        if (!url) continue;
-        const station = {name: clean(s.name), url, country: clean(s.country), tags: clean(s.tags), category: category(s), codec: clean(s.codec), bitrate: Number(s.bitrate) || 0};
-        if (!unique.has(url)) unique.set(url, station);
+      if(!Array.isArray(stations)) throw new Error("Respuesta inesperada");
+      if(state !== searchState) return;
+      for(const s of stations) {
+        const stream = safeStream(s.url_resolved||s.url);
+        if(!stream||seenStreams.has(stream))continue;
+        seenStreams.add(stream);
+        stationList.push({name:clean(s.name),url:stream,country:clean(s.country),tags:clean(s.tags),category:category(s),codec:clean(s.codec),bitrate:Number(s.bitrate)||0});
       }
-      if (unique.size >= 30) break;
+      state.offset += stations.length;
+      if(stations.length<PAGE_SIZE) {
+        state.tagIndex++;
+        state.offset=0;
+        if(state.tagIndex>=state.tags.length)state.exhausted=true;
+      }
     }
-    if (request !== currentRequest) return;
-    const playable = [...unique.values()].slice(0, 30);
-    stationList = playable;
-    activeStationIndex = -1;
-    playable.forEach((s,i) => stationRow(s, target, false, i+1));
-    const description = [topic?.label, country || null, name || null].filter(Boolean).join(" · ") || query;
-    status(playable.length ? `${playable.length} emisoras para «${description}». Las categorías proceden de etiquetas del directorio y pueden ser inexactas.` : "No hay emisoras HTTPS para esta búsqueda. Prueba otro país, género o nombre.");
-  } catch (error) {
-    if (error.name !== "AbortError" && request === currentRequest) status("No se pudo consultar el directorio. Prueba de nuevo o introduce una URL propia.");
+    renderMore();
+  } catch(error) {
+    if(error.name!=="AbortError"&&state===searchState)status("No se pudieron cargar más emisoras. Inténtalo otra vez.");
+  } finally {
+    loadingMore=false;
+    more.disabled=false;
   }
+}
+function startStationSearch({country="",countrycode="",name="",tags=[""],label="Radios del mundo"}) {
+  if(currentRequest)currentRequest.abort();
+  currentRequest=new AbortController();
+  searchState={country,countrycode,name,tags,tagIndex:0,offset:0,controller:currentRequest,exhausted:false,label};
+  stationList=[];activeStationIndex=-1;seenStreams.clear();
+  $("results").replaceChildren();
+  $("more-stations").hidden=false;
+  status("Buscando emisoras...");
+  loadPage();
+}
+$("search-form").addEventListener("submit",event=>{
+  event.preventDefault();
+  const query=clean($("query").value);
+  if(!query)return;
+  const {country,topic,name}=interpretQuery(query);
+  startStationSearch({country,name,tags:topic?topic.tags:[""],label:query});
 });
+$("world-stations").addEventListener("click",()=>{
+  $("query").value="";
+  startStationSearch({label:"Todo el mundo"});
+});
+$("more-stations").addEventListener("click",async()=>{
+  if(loadingMore)return;
+  if($("results").children.length<stationList.length){renderMore();return;}
+  await loadPage();
+});
+window.FLCOStartCountrySearch = countrycode => {
+  if(!/^[A-Z]{2}$/.test(countrycode))return;
+  startStationSearch({countrycode,label:"País "+countrycode});
+};
 $("url-form").addEventListener("submit", event => {
   event.preventDefault();
   play({name: clean($("station-name").value), url: $("station-url").value});
@@ -182,19 +228,3 @@ renderFavorites();
 
 window.FLCOStations = {step(delta) {if (!stationList.length) {status("Busca primero emisoras para cambiar de canal.");return;} const next=(activeStationIndex+delta+stationList.length)%stationList.length;play(stationList[next]);}, current(){return activeStationIndex;}};
 
-// Mismo reproductor, favoritos y numeración para resultados de proximidad.
-window.FLCOShowNearby = function(stations) {
-  const target = $("results");
-  target.replaceChildren();
-  const unique = new Map();
-  for (const s of stations) {
-    const url = safeStream(s.url_resolved || s.url);
-    if (!url || unique.has(url)) continue;
-    unique.set(url, {name:clean(s.name),url,country:clean(s.country),category:category(s),codec:clean(s.codec),bitrate:Number(s.bitrate)||0});
-  }
-  stationList = [...unique.values()].slice(0,30);
-  activeStationIndex = -1;
-  stationList.forEach((station,i)=>stationRow(station,target,false,i+1));
-  status(stationList.length ? stationList.length + " radios encontradas en el directorio. Elige un número para escuchar." : "No hay radios HTTPS disponibles en esta búsqueda.");
-  return stationList.length;
-};
