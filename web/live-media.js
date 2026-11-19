@@ -34,8 +34,10 @@
     try {
       if (!context) context=new AC();
       await context.resume();
+      if (source) { try { source.disconnect(); } catch (_) {} source = null; analyser = null; }
       if (!analyser) {
         const stream=player.captureStream();
+        if (!stream.getAudioTracks().length) throw new Error("No audio tracks available");
         source=context.createMediaStreamSource(stream);
         analyser=context.createAnalyser();
         analyser.fftSize=2048;
@@ -45,54 +47,12 @@
       active=true;
       draw();
     } catch (_) {
-      $("live-info").textContent="La radio puede seguir escuchándose. Este flujo no permite leer sus muestras de audio; no se dibujarán ondas inventadas. Consulta los datos de la emisora.";
+      $("live-info").textContent="No hay muestras de audio accesibles para dibujar. Prueba a pulsar reproducir primero y luego Ver ondas, o abre un archivo local. No se generan ondas falsas.";
     }
   });
   $("stop-visualizer").addEventListener("click", () => {
     active=false;cancelAnimationFrame(animation);
+    if (source) {source.disconnect();source=null;analyser=null;}
     $("live-info").textContent="Gráfico detenido; la radio puede continuar sonando.";
-  });
-  // Accesos directos reutilizan el buscador único, sin un segundo sistema de búsqueda.
-  const shortcuts={news:"noticias",sports:"deportes",music:"música",all:"España"};
-  document.querySelectorAll("[data-browse]").forEach(button=>button.addEventListener("click",()=>{
-    $("query").value=shortcuts[button.dataset.browse];
-    $("search-form").requestSubmit();
-  }));
-
-  // Wikimedia Commons: solo metadatos y archivos públicos. No atribuir licencias no comprobadas.
-  $("media-search").addEventListener("submit", async event=>{
-    event.preventDefault();
-    const query=$("media-query").value.trim();
-    if(!query) return;
-    const target=$("media-results");
-    target.replaceChildren();
-    $("media-status").textContent="Buscando imágenes y vídeos públicos...";
-    const controller=new AbortController();
-    const timer=setTimeout(()=>controller.abort(),12000);
-    try {
-      const url=new URL("https://commons.wikimedia.org/w/api.php");
-      for(const [k,v] of Object.entries({action:"query",generator:"search",gsrsearch:query,gsrnamespace:"6",gsrlimit:"20",prop:"imageinfo",iiprop:"url|mime|extmetadata",iiurlwidth:"360",format:"json",origin:"*"}))url.searchParams.set(k,v);
-      const response=await fetch(url,{signal:controller.signal});
-      if(!response.ok)throw new Error("HTTP");
-      const data=await response.json();
-      const pages=Object.values(data.query?.pages||{});
-      let count=0;
-      for(const page of pages) {
-        const info=page.imageinfo?.[0];
-        if(!info || !/^image\/(png|jpeg|gif|webp)$|^video\/(webm|ogg|mp4)$/.test(info.mime||""))continue;
-        const card=document.createElement("article");card.className="media-card";
-        const title=document.createElement("p");title.textContent=page.title.replace(/^File:/,"");
-        const link=document.createElement("a");link.href=info.descriptionurl||"https://commons.wikimedia.org";link.target="_blank";link.rel="noopener noreferrer";link.textContent="Ver archivo, fuente y licencia";
-        if(info.mime.startsWith("image/")) {
-          const img=document.createElement("img");img.src=info.thumburl||info.url;img.alt=title.textContent;img.loading="lazy";card.append(img);
-        } else {
-          const video=document.createElement("video");video.controls=true;video.preload="none";video.src=info.url;video.setAttribute("aria-label",title.textContent);card.append(video);
-        }
-        card.append(title,link);target.append(card);count++;
-      }
-      $("media-status").textContent=count?`${count} archivos multimedia encontrados en Wikimedia Commons. No son emisiones de TV en directo.`:"No se encontraron imágenes o vídeos compatibles. Prueba otra búsqueda.";
-    } catch(_) {
-      $("media-status").textContent="No se pudo consultar Wikimedia Commons. Comprueba la conexión.";
-    } finally {clearTimeout(timer);}
   });
 })();
