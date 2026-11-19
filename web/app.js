@@ -76,6 +76,8 @@ $("search-form").addEventListener("submit", async (event) => {
   try {
     const url = new URL(DIRECTORY);
     url.searchParams.set("name", query);
+    const country = clean($("country").value);
+    if (country) url.searchParams.set("country", country);
     url.searchParams.set("hidebroken", "true");
     url.searchParams.set("limit", "30");
     const response = await fetch(url, {signal: currentRequest.signal, headers: {"Accept": "application/json"}});
