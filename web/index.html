@@ -4,7 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#101827"><title>FLCO · Radio de código libre</title>
 <link rel="stylesheet" href="styles.css">
-<script src="app.js" defer></script><script src="live-media.js" defer></script><script src="offline.js" defer></script>
+<script src="app.js" defer></script><script src="dial.js" defer></script><script src="offline.js" defer></script>
 </head>
 <body>
 <header class="topbar"><button id="back-button" type="button" aria-label="Volver a la página anterior">← Volver</button><div><h1>📻 FLCO Radio</h1><p>Radio de código abierto · MIT</p></div><span id="connection-state" role="status">Comprobando conexión…</span></header>
@@ -13,18 +13,18 @@
 <h2>Buscar radios</h2>
 <form id="search-form"><label for="query">País, noticias, música, deportes o nombre</label><div class="horizontal"><input id="query" type="search" placeholder="México, noticias, jazz..." maxlength="100" required><button type="submit">Buscar</button></div></form>
 <p class="hint">Las emisoras se escuchan por Internet. Puedes elegir cualquier país escribiendo su nombre.</p>
-<div id="status" role="status" aria-live="polite"></div><ul id="results" class="stations"></ul>
+<div id="status" role="status" aria-live="polite"></div><p class="hint">Las emisoras aparecen numeradas. Pulsa un número o usa Anterior y Siguiente.</p><ul id="results" class="stations"></ul>
 </section>
 <section class="panel" id="listen-panel">
 <h2>Escuchar</h2><p id="now-playing">Selecciona una emisora o un archivo local</p>
 <audio id="player" controls preload="none"></audio>
 <p id="station-details" class="hint">Aquí verás la información de la radio seleccionada.</p>
-<h3>Ondas del sonido</h3>
-<p class="hint">Visualización matemática de muestras reales del audio cuando el navegador permite capturarlas. No mide interferencias de antena ni inventa ondas.</p>
-<button id="start-visualizer" type="button">Ver ondas</button><button id="stop-visualizer" type="button" class="secondary">Detener gráfico</button>
-<canvas id="live-wave" width="760" height="160" role="img" aria-label="Forma de onda del audio"></canvas>
-<canvas id="live-spectrum" width="760" height="160" role="img" aria-label="Frecuencias del audio"></canvas>
-<p id="live-info" role="status" aria-live="polite">Selecciona una radio y pulsa Ver ondas.</p>
+<div class="radio-dial" id="radio-dial" aria-label="Animación decorativa de la radio">
+<div class="dial-heading"><strong id="dial-number">CANAL —</strong><span id="dial-mode">Radio lista</span></div>
+<div class="dial-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<p class="hint">Barras y colores decorativos que cambian con la emisora. No representan ondas ni intensidad de señal.</p>
+</div>
+<div class="channel-nav"><button id="prev-station" type="button">← Anterior</button><button id="next-station" type="button">Siguiente →</button></div>
 </section>
 <section class="panel">
 <h2>Sin Internet</h2>

@@ -1,25 +1,25 @@
-# FLCO — Radio de código abierto
+# FLCO · Radio de código abierto
 
-FLCO es una radio web minimalista y adaptable a **MX Linux y móviles**. Permite buscar emisoras públicas por Internet, escucharlas, guardar favoritos, consultar metadatos y visualizar las ondas del audio cuando el navegador permite acceder a las muestras. También permite abrir archivos de audio del dispositivo **sin Internet**.
+FLCO es una radio web minimalista para escuchar emisoras públicas por Internet, buscar por país o género, guardar favoritos y cambiar entre **canales numerados 1, 2, 3, 4, 5…**. Tiene un dial de **barras azules animadas** y colores que cambian con cada emisora. Estas barras son **decorativas** y no pretenden medir ondas ni interferencias.
 
-**Licencia del código: [MIT](LICENSE).** El código es abierto y puede usarse, modificarse y redistribuirse bajo sus condiciones. Las emisiones y contenidos de terceros tienen licencias independientes.
+**Proyecto desarrollado con asistencia de inteligencia artificial (IA)**, bajo dirección y revisión humana. El código fuente tiene **[licencia MIT](LICENSE)**, que permite usar, estudiar, modificar y redistribuir el software bajo sus condiciones. La licencia del código no concede derechos sobre las emisiones de terceros.
 
-## Funciones
+> Estado: prototipo web en desarrollo. La rama `feature/flco-numbered-radio-dial` no está fusionada con `main`. Las funciones nuevas requieren pruebas manuales en los navegadores de destino.
 
-| Función | Estado |
-| --- | --- |
-| Buscar emisoras por nombre, país o tema en un único campo | Prototipo funcional, depende de Radio Browser |
-| Escuchar emisoras y guardar favoritos | Depende de conexión y compatibilidad del flujo |
-| Mostrar país, categoría, códec y bitrate declarados | Cuando los proporciona el directorio |
-| Ver forma de onda y espectro del audio | Cuando el navegador permite capturar muestras; **no son señales RF** |
-| Botón Volver y diseño móvil | Incluidos |
-| Abrir FLCO sin conexión | Tras una visita inicial con conexión y caché del navegador |
-| Reproducir archivos locales sin conexión | Incluido, formatos compatibles con el navegador |
-| Radio FM real por antena sin Internet | Requiere receptor RTL-SDR USB; no integrado en la web |
+## Qué puedes hacer
 
-Se han retirado de la interfaz los paneles de televisión, simulación, pruebas de velocidad y otros controles experimentales. El explorador RTL-SDR Python sigue en el repositorio, independiente de la radio web.
+- **Con Internet:** buscar emisoras por país, nombre o tema; escucharlas si el flujo es compatible; ver nombre, país, categoría, códec y bitrate cuando el directorio los proporciona; guardar favoritos.
+- **Cambiar de canal:** pulsa el número de una emisora o los botones **Anterior** y **Siguiente**. El dial cambia de color y anima barras azules cuando suena el reproductor.
+- **Sin Internet:** abrir la interfaz desde su caché tras una primera visita compatible y reproducir **archivos de audio locales** con el selector de archivos. Los favoritos guardan enlaces, no grabaciones; las emisoras de Internet **no funcionan offline**.
+- **Móvil:** interfaz adaptable y controles táctiles. La reproducción depende del navegador y el formato.
 
-## Iniciar en MX Linux
+No se muestran ya los gráficos de ondas de audio que fallaban, la televisión ni los paneles de simulación.
+
+## Instalación y uso por sistema operativo
+
+FLCO web **no tiene instaladores nativos** (.deb, .exe, .dmg o APK) ni publicación en tiendas. Se sirve como sitio web local. Los siguientes son métodos orientativos, **no una garantía de compatibilidad con todos los sistemas operativos**.
+
+### Linux (MX Linux, Debian, Ubuntu y distribuciones con Python 3)
 
 ```bash
 sudo apt update
@@ -27,49 +27,103 @@ sudo apt install git python3
 git clone https://github.com/Dirix24/FLCO.git
 cd FLCO
 git fetch origin
-git switch --track origin/feature/flco-minimal-radio-mobile
+git switch --track origin/feature/flco-numbered-radio-dial
 python3 -m http.server 8000 --directory web
 ```
 
-Si ya tienes el repositorio, sustituye `git clone ...` por `cd ~/FLCO`. Abre `http://localhost:8000` en Firefox y actualiza con `Ctrl+Shift+R`. Para detener el servidor pulsa `Ctrl+C`.
-
-## Escuchar y ver ondas
-
-Busca una radio y pulsa **Escuchar**. Debajo del reproductor aparecerán sus metadatos. Pulsa **Ver ondas** cuando el audio esté reproduciéndose. El visualizador usa muestras digitales reales y cálculos de amplitud/espectro; algunos flujos externos no permiten que el navegador capture su audio. Si ocurre, se informa y no se inventan ondas ni interferencias. **No se miden radiofrecuencia, cobertura ni dBm**.
-
-## Uso sin Internet
-
-1. Abre FLCO al menos una vez con conexión desde `http://localhost:8000` o un sitio HTTPS y espera a que el navegador guarde los archivos básicos mediante Service Worker.
-2. Después puedes volver a abrir la página desde la misma dirección, siempre que el navegador conserve su caché y la aplicación esté disponible en ese origen.
-3. En **Sin Internet**, selecciona un archivo de audio del teléfono u ordenador y reprodúcelo. Los archivos locales no se suben al servidor.
-4. Los favoritos siguen visibles si el almacenamiento del navegador se conserva, pero las emisoras de Internet **no pueden emitir sin conexión**.
-
-**Importante:** un servidor local en MX Linux puede funcionar sin salida a Internet mientras el ordenador siga encendido. En el móvil, la primera visita a la dirección local requiere conexión con el ordenador; la caché offline depende del navegador. Sin receptor RTL-SDR, FLCO no puede sintonizar radio FM por antena.
-
-## Explorador RTL-SDR independiente
-
-El repositorio conserva `opensdr_explorer.py` para uso con un RTL-SDR USB. Requiere hardware, controladores y dependencias del sistema:
+Si ya tienes el repositorio:
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-python opensdr_explorer.py
+cd ~/FLCO
+git fetch origin
+git switch --track origin/feature/flco-numbered-radio-dial
+python3 -m http.server 8000 --directory web
 ```
 
-No hay todavía un puente seguro entre el receptor y la interfaz web.
+Abre **http://localhost:8000**. Si ya estabas en otra rama de FLCO, guarda primero los cambios sin confirmar antes de cambiar de rama.
 
-## Verificación
+### Windows 10/11 (PowerShell, con Git y Python 3 instalados)
+
+```powershell
+git clone https://github.com/Dirix24/FLCO.git
+cd FLCO
+git fetch origin
+git switch --track origin/feature/flco-numbered-radio-dial
+py -3 -m http.server 8000 --directory web
+```
+
+Abre **http://localhost:8000** en Edge o Firefox. Si `py` no existe, prueba `python -m http.server 8000 --directory web`. Instala Git y Python desde sus distribuidores oficiales antes de ejecutar los comandos.
+
+### macOS (Terminal, con Git y Python 3 instalados)
+
+```bash
+git clone https://github.com/Dirix24/FLCO.git
+cd FLCO
+git fetch origin
+git switch --track origin/feature/flco-numbered-radio-dial
+python3 -m http.server 8000 --directory web
+```
+
+Abre **http://localhost:8000** en Safari o Firefox. La compatibilidad de reproducción varía.
+
+### Android / iPhone / iPad
+
+No hay APK ni app nativa. Abre la versión web desde un **servidor HTTPS** alojado para FLCO, o desde un ordenador de tu red que sirva la página. Para el uso offline del Service Worker se necesita **HTTPS o localhost**; una URL HTTP de la IP local del ordenador normalmente no permitirá registrar el Service Worker. El acceso offline puede variar por navegador y política de almacenamiento. No se ha verificado todavía una instalación PWA independiente en Android o iOS.
+
+### Otros sistemas (BSD, ChromeOS, etc.)
+
+Si cuentan con navegador moderno y un servidor HTTP que sirva la carpeta `web`, **podrían** ejecutar la interfaz. No hay soporte ni comandos universales verificados para todos los sistemas. La aplicación Python RTL-SDR puede necesitar dependencias específicas de cada plataforma.
+
+## Uso diario
+
+1. Arranca el servidor y abre FLCO.
+2. Escribe un país, «noticias», «música» o el nombre de una emisora y pulsa **Buscar**.
+3. En los resultados numerados pulsa **1, 2, 3…** o **Escuchar**.
+4. Cambia de emisora con **Anterior** o **Siguiente**. Los colores y barras cambian con el canal; no indican intensidad RF.
+5. Usa **☆ Guardar** para favoritos y **← Volver** para regresar.
+6. Sin Internet, abre la página previamente guardada y elige un **archivo de audio local**. La escucha de emisoras online requiere Internet.
+
+## ¿Qué antena necesito?
+
+| Caso | Antena / hardware |
+| --- | --- |
+| Escuchar emisoras por Internet | **Ninguna antena de radio**; solo conexión Wi-Fi, Ethernet o datos móviles |
+| Reproducir audio local sin Internet | **Ninguna antena** |
+| Recibir radio FM real (87,5–108 MHz) sin Internet | **Receptor RTL-SDR USB** compatible y antena telescópica o dipolo ajustado a la banda FM |
+| Mejorar recepción FM débil | Antena exterior para banda FM, ubicación despejada y cable coaxial adecuado |
+| Explorar otras bandas con SDR | Antena diseñada para la banda de frecuencia que quieras recibir; verifica legalidad y compatibilidad |
+
+**Importante:** la interfaz web todavía **no** controla el RTL-SDR ni reproduce FM por antena. El repositorio conserva un script Python separado `opensdr_explorer.py` para explorar espectro con hardware compatible, pero no sustituye a un receptor FM completo. Una antena sola no basta.
+
+## Desinstalar
+
+**Primero** detén el servidor con `Ctrl+C`. Los siguientes comandos borran únicamente la carpeta del clon de FLCO: revisa la ruta y **haz copia de cualquier cambio o archivo personal antes de borrarla**. No desinstalan Git, Python ni los controladores SDR.
+
+Linux/macOS, desde el directorio que contiene la carpeta FLCO:
+
+```bash
+rm -r ./FLCO
+```
+
+Windows PowerShell, desde el directorio que contiene la carpeta FLCO:
+
+```powershell
+Remove-Item -LiteralPath .\FLCO -Recurse
+```
+
+En Android/iOS elimina los datos de sitio de FLCO desde la configuración del navegador y, si habías creado un acceso directo a la pantalla de inicio, elimínalo. Esto también puede borrar favoritos guardados. En Linux/macOS/Windows puedes limpiar los datos del sitio en el navegador para quitar la caché offline y los favoritos. **No ejecutes los comandos de borrado dentro de la propia carpeta FLCO.**
+
+## Verificaciones y límites
 
 ```bash
 node --check web/app.js
-node --check web/live-media.js
+node --check web/dial.js
 node --check web/offline.js
 node --check web/sw.js
 ```
 
-La sintaxis no sustituye pruebas reales en Firefox, Android y iPhone. La compatibilidad de análisis de audio varía por navegador y emisora.
+Las comprobaciones de sintaxis no garantizan la reproducción de todas las radios. El directorio externo puede estar caído y los flujos pueden requerir formatos no admitidos. El modo offline depende de que el navegador haya guardado la interfaz. Los archivos locales no se suben a un servidor.
 
-## Privacidad y contribuciones
+## Licencia, autoría y privacidad
 
-Las búsquedas de emisoras consultan el directorio externo Radio Browser. Los favoritos se guardan en el navegador. Los archivos locales se reproducen mediante URL temporal del dispositivo sin subirse. No se solicita ubicación en esta versión. Puedes revisar el código y contribuir mediante GitHub. **No hay fusiones automáticas a `main`.**
+**Código abierto MIT. Desarrollado con asistencia de IA.** Consulta [LICENSE](LICENSE). Los favoritos se guardan localmente en el navegador. Las búsquedas online se envían a Radio Browser. FLCO no necesita permisos de geolocalización para el buscador actual. Los contenidos de terceros conservan sus licencias y condiciones.

@@ -17,6 +17,8 @@ function loadFavorites() {
   } catch { return []; }
 }
 let favorites = loadFavorites();
+let stationList = [];
+let activeStationIndex = -1;
 function saveFavorites() {
   try { localStorage.setItem(KEY, JSON.stringify(favorites)); }
   catch { status("No se pudieron guardar los favoritos en este navegador."); }
@@ -25,6 +27,9 @@ function play(station) {
   const url = safeStream(station.url);
   if (!url) { status("Se necesita un enlace de audio HTTPS válido."); return; }
   $("now-playing").textContent = clean(station.name) || "Emisora";
+  const index = stationList.findIndex(s => s.url === station.url);
+  activeStationIndex = index;
+  document.dispatchEvent(new CustomEvent("flco:station", {detail:{index, name:clean(station.name), url}}));
   const player = $("player");
   player.pause();
   player.src = url;
@@ -33,7 +38,7 @@ function play(station) {
   if (info) info.textContent = [clean(station.category) || "Categoría no confirmada",clean(station.country),clean(station.codec) ? "Códec: " + station.codec : "",station.bitrate ? "Bitrate declarado: " + station.bitrate + " kbps" : ""].filter(Boolean).join(" · ") + " · Flujo: " + url + " · Estos datos son del directorio, no mediciones RF.";
   player.play().catch(() => status("Pulsa reproducir en el control de audio. Comprueba que el formato sea compatible."));
 }
-function stationRow(station, target, favoriteMode = false) {
+function stationRow(station, target, favoriteMode = false, number = null) {
   const li = document.createElement("li");
   const name = document.createElement("span");
   name.textContent = clean(station.name) || "Emisora sin nombre";
@@ -42,6 +47,7 @@ function stationRow(station, target, favoriteMode = false) {
   details.append(name);
   const metadata = [clean(station.category), clean(station.country)].filter(Boolean).join(" · ");
   if (metadata) { const small = document.createElement("small"); small.textContent = metadata; details.append(small); }
+  if (number !== null) { const channel = document.createElement("button"); channel.type = "button"; channel.className = "channel-number"; channel.textContent = String(number); channel.setAttribute("aria-label", "Escuchar canal " + number + ": " + (station.name || "Emisora")); channel.addEventListener("click", () => play(station)); li.append(channel); }
   li.append(details);
   const actions = document.createElement("div");
   actions.className = "actions";
@@ -158,7 +164,9 @@ $("search-form").addEventListener("submit", async (event) => {
     }
     if (request !== currentRequest) return;
     const playable = [...unique.values()].slice(0, 30);
-    playable.forEach(s => stationRow(s, target));
+    stationList = playable;
+    activeStationIndex = -1;
+    playable.forEach((s,i) => stationRow(s, target, false, i+1));
     const description = [topic?.label, country || null, name || null].filter(Boolean).join(" · ") || query;
     status(playable.length ? `${playable.length} emisoras para «${description}». Las categorías proceden de etiquetas del directorio y pueden ser inexactas.` : "No hay emisoras HTTPS para esta búsqueda. Prueba otro país, género o nombre.");
   } catch (error) {
@@ -171,3 +179,5 @@ $("url-form").addEventListener("submit", event => {
 });
 $("player").addEventListener("error", () => status("No se puede reproducir este flujo. Puede estar caído o usar un formato no compatible."));
 renderFavorites();
+
+window.FLCOStations = {step(delta) {if (!stationList.length) {status("Busca primero emisoras para cambiar de canal.");return;} const next=(activeStationIndex+delta+stationList.length)%stationList.length;play(stationList[next]);}, current(){return activeStationIndex;}};

@@ -64,3 +64,6 @@ Se han retirado de la interfaz los paneles de ondas y espectro simulados. El vis
 
 ## Interfaz minimalista offline
 La rama `feature/flco-minimal-radio-mobile` usa `web/index.html`, `app.js`, `live-media.js`, `offline.js`, `sw.js` y `styles.css`. Se eliminan de la interfaz las secciones de TV y pruebas de red; la interfaz puede almacenarse mediante Service Worker en origen seguro y reproduce archivos locales sin Internet. El visualizador se basa en muestras reales del audio cuando `captureStream` está disponible y el origen del flujo lo permite; no simula RF. La integración SDR real permanece separada.
+
+## Dial de emisoras numeradas
+La interfaz carga `web/dial.js` en lugar de `live-media.js`, que deja de utilizarse. `app.js` enumera resultados y emite `flco:station` al seleccionar una emisora. `dial.js` muestra barras azules decorativas y cambia su color según un hash estable de la URL de la emisora; la animación no representa audio ni RF. El Service Worker actualiza la caché de la interfaz. La aplicación web no incorpora un receptor FM sin Internet.
