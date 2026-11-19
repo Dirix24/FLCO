@@ -13,3 +13,29 @@
 .channel-nav{display:flex;gap:.7rem}.channel-nav button{flex:1}
 @media(prefers-reduced-motion:reduce){.radio-dial.is-playing .dial-bars i{animation:none}}
 @media(max-width:420px){.channel-nav{flex-direction:column}.dial-bars{gap:3px}}
+
+/* FLCO · tema negro con líneas blancas y amarillo suave */
+:root{background:#000;color:#f4f3ec;--flco-accent:#e9dba0;--flco-line:#e7e7df}
+html,body{background:#000;color:#f4f3ec}
+.topbar{background:#050505;border-bottom:2px solid var(--flco-accent)}
+.topbar h1{color:var(--flco-accent)}
+.topbar p,.topbar #connection-state,.hint,footer,.station-details small{color:#c9c8be}
+main{background:#000}
+.panel{background:#090909;border:1px solid #8c8b83;border-left:3px solid var(--flco-accent)}
+.panel h2,.panel summary{color:var(--flco-accent)}
+.stations li{background:#050505;border:1px solid #77776e;border-bottom-color:var(--flco-accent)}
+button{background:var(--flco-accent);color:#15140e}
+button:hover{background:#fff2bb;color:#0b0b0b}
+button.secondary,.topbar #back-button{background:#181818;color:#f6f4e9;border:1px solid #9c9a8e}
+button.secondary:hover,.topbar #back-button:hover{background:#292929}
+input{background:#060606;color:#fff;border:1px solid #aaa99e}
+input:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid var(--flco-accent);outline-offset:3px}
+a{color:#f4e5ab}
+canvas{background:#050505;border:1px solid #8b8b82}
+.channel-number{background:#111;color:var(--flco-accent);border:1px solid var(--flco-accent)}
+.channel-number:hover{background:#302b1c;color:#fff}
+.radio-dial{background:#060606;border:1px solid var(--flco-accent)}
+.dial-heading{color:#f7edc9}
+.dial-bars i{background:var(--flco-accent);box-shadow:0 0 9px #e9dba066}
+footer{border-top:1px solid #66665f}
+@media(max-width:600px){.panel{border-left-width:2px}}
