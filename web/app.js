@@ -181,3 +181,20 @@ $("player").addEventListener("error", () => status("No se puede reproducir este 
 renderFavorites();
 
 window.FLCOStations = {step(delta) {if (!stationList.length) {status("Busca primero emisoras para cambiar de canal.");return;} const next=(activeStationIndex+delta+stationList.length)%stationList.length;play(stationList[next]);}, current(){return activeStationIndex;}};
+
+// Mismo reproductor, favoritos y numeración para resultados de proximidad.
+window.FLCOShowNearby = function(stations) {
+  const target = $("results");
+  target.replaceChildren();
+  const unique = new Map();
+  for (const s of stations) {
+    const url = safeStream(s.url_resolved || s.url);
+    if (!url || unique.has(url)) continue;
+    unique.set(url, {name:clean(s.name),url,country:clean(s.country),category:category(s),codec:clean(s.codec),bitrate:Number(s.bitrate)||0});
+  }
+  stationList = [...unique.values()].slice(0,30);
+  activeStationIndex = -1;
+  stationList.forEach((station,i)=>stationRow(station,target,false,i+1));
+  status(stationList.length ? stationList.length + " radios encontradas en el directorio. Elige un número para escuchar." : "No hay radios HTTPS disponibles en esta búsqueda.");
+  return stationList.length;
+};

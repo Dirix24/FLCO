@@ -1,68 +1,47 @@
 "use strict";
-(function () {
-  const $ = id => document.getElementById(id);
-  const nearbyButton = $("nearby-stations");
-  nearbyButton.addEventListener("click", () => {
-    const output = $("nearby-info");
-    const results = $("nearby-results");
-    results.replaceChildren();
-    if (!navigator.geolocation) {
-      output.textContent = "Este navegador no ofrece geolocalización.";
-      return;
-    }
-    nearbyButton.disabled = true;
-    output.textContent = "Solicitando permiso de ubicación...";
-    navigator.geolocation.getCurrentPosition(async position => {
-      const lat = position.coords.latitude, lon = position.coords.longitude;
-      if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
-        output.textContent = "Coordenadas inválidas."; nearbyButton.disabled = false; return;
-      }
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 10000);
-      try {
-        const url = new URL("https://de1.api.radio-browser.info/json/stations/search");
-        url.searchParams.set("geo_lat", String(lat));
-        url.searchParams.set("geo_long", String(lon));
-        url.searchParams.set("geo_distance", "100000");
-        url.searchParams.set("hidebroken", "true");
-        url.searchParams.set("limit", "20");
-        const response = await fetch(url, {signal: controller.signal, headers: {Accept: "application/json"}});
-        if (!response.ok) throw new Error("Servicio no disponible");
-        const stations = await response.json();
-        if (!Array.isArray(stations)) throw new Error("Respuesta inesperada");
-        let shown = 0;
-        for (const station of stations) {
-          let stream;
-          try {
-            const parsed = new URL(station.url_resolved || station.url);
-            if (parsed.protocol !== "https:") continue;
-            stream = parsed.href;
-          } catch { continue; }
-          const item = document.createElement("li");
-          const name = document.createElement("span");
-          name.textContent = String(station.name || "Emisora").trim();
-          const button = document.createElement("button");
-          button.type = "button";
-          button.textContent = "Escuchar";
-          button.addEventListener("click", () => {
-            const player = $("player");
-            player.pause();
-            player.src = stream;
-            $("now-playing").textContent = name.textContent;
-            player.load();
-            player.play().catch(() => { output.textContent = "Pulsa reproducir en el reproductor; el formato podría ser incompatible."; });
-          });
-          item.append(name, button);
-          results.append(item);
-          shown++;
-        }
-        output.textContent = shown ? `El directorio devolvió ${shown} emisoras con flujo HTTPS. No garantiza recepción local por antena.` : "No hay emisoras HTTPS en los resultados de proximidad. Prueba el buscador por país.";
-      } catch {
-        output.textContent = "No se pudo consultar el directorio. Puedes buscar por país sin compartir tu ubicación.";
-      } finally { clearTimeout(timeout); nearbyButton.disabled = false; }
-    }, error => {
-      output.textContent = error.code === 1 ? "Permiso denegado. Puedes buscar por país sin ubicación." : "No se pudo obtener la ubicación. Comprueba los permisos y el acceso HTTPS.";
-      nearbyButton.disabled = false;
-    }, {enableHighAccuracy: false, timeout: 10000, maximumAge: 0});
-  });
+(function(){
+ const button=document.getElementById("nearby-stations");
+ const info=document.getElementById("nearby-info");
+ if(!button||!info)return;
+ button.addEventListener("click",()=>{
+   if(!navigator.geolocation){info.textContent="Este navegador no admite ubicación.";return;}
+   if(!window.isSecureContext){info.textContent="Para usar ubicación abre FLCO en HTTPS o localhost. La ubicación no funciona normalmente desde una IP HTTP.";return;}
+   button.disabled=true;
+   info.textContent="Solicitando permiso para localizar emisoras de tu país...";
+   navigator.geolocation.getCurrentPosition(async position=>{
+     const controller=new AbortController();
+     const timer=setTimeout(()=>controller.abort(),15000);
+     try{
+       // Se envían coordenadas solo tras pulsar el botón y conceder permiso.
+       const reverse=new URL("https://nominatim.openstreetmap.org/reverse");
+       reverse.searchParams.set("lat",String(position.coords.latitude));
+       reverse.searchParams.set("lon",String(position.coords.longitude));
+       reverse.searchParams.set("format","jsonv2");
+       reverse.searchParams.set("zoom","3");
+       reverse.searchParams.set("addressdetails","1");
+       const geoResponse=await fetch(reverse,{signal:controller.signal,headers:{Accept:"application/json"}});
+       if(!geoResponse.ok)throw new Error("geocoding");
+       const location=await geoResponse.json();
+       const countryCode=String(location.address?.country_code||"").toUpperCase();
+       if(!/^[A-Z]{2}$/.test(countryCode))throw new Error("country");
+       const url=new URL("https://de1.api.radio-browser.info/json/stations/search");
+       url.searchParams.set("countrycode",countryCode);
+       url.searchParams.set("countrycodeexact","true");
+       url.searchParams.set("hidebroken","true");
+       url.searchParams.set("limit","100");
+       url.searchParams.set("order","votes");
+       url.searchParams.set("reverse","true");
+       const response=await fetch(url,{signal:controller.signal,headers:{Accept:"application/json"}});
+       if(!response.ok)throw new Error("directory");
+       const stations=await response.json();
+       if(!Array.isArray(stations))throw new Error("stations");
+       const count=window.FLCOShowNearby(stations);
+       info.textContent=count?count+" emisoras del país detectado ("+countryCode+"). Ordenadas por votos del directorio, no por intensidad de antena. Datos de ubicación: © OpenStreetMap contributors.":"No hay emisoras compatibles. Prueba el buscador.";
+     }catch(_){info.textContent="No se pudo buscar por ubicación. Puedes buscar por país manualmente.";}
+     finally{clearTimeout(timer);button.disabled=false;}
+   },error=>{
+     info.textContent=error.code===1?"Permiso de ubicación denegado. Puedes buscar por país manualmente.":"No se pudo obtener la ubicación. Comprueba los permisos.";
+     button.disabled=false;
+   },{enableHighAccuracy:false,timeout:12000,maximumAge:600000});
+ });
 })();
