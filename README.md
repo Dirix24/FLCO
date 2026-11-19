@@ -8,7 +8,7 @@ FLCO es un proyecto en desarrollo para **escuchar emisoras por Internet** desde 
 
 | Función | Estado | Requisitos |
 | --- | --- | --- |
-| Buscar emisoras por nombre | Prototipo web | Internet; directorio externo Radio Browser |
+| Buscar emisoras por país, tema o nombre en un solo campo | Prototipo web | Internet; directorio externo Radio Browser |
 | Escuchar emisoras y URL de audio HTTPS | Prototipo web | Navegador compatible con el flujo |
 | Guardar favoritos | Prototipo web | Almacenamiento local del navegador |
 | Generar ondas de prueba (seno, cuadrada, AM y ruido) | Prototipo web | Sin antena; no transmite RF |
@@ -61,7 +61,7 @@ Para abrirlo desde un teléfono en la misma red, utiliza la dirección LAN del o
 ## Probar el laboratorio web
 
 En la página:
-1. Busca una emisora y pulsa **Escuchar**. Algunas estaciones no reproducen audio por formatos incompatibles o enlaces caídos.
+1. Escribe «España», «noticias de España», «deportes» o un nombre en el buscador único y pulsa **Buscar radios**. Los resultados muestran etiquetas orientativas de Noticias, Deportes, Música o categoría no confirmada. Pulsa **Escuchar**. Algunas estaciones no reproducen audio por formatos incompatibles o enlaces caídos.
 2. Guarda una emisora en **Favoritos**.
 3. En **Laboratorio de señales simuladas**, selecciona una onda, cambia la frecuencia y pulsa **Generar señal**.
 4. En **Explorador de espectro simulado**, cambia el ruido y observa la interferencia matemática.
@@ -135,3 +135,6 @@ Esta rama se ha creado **a partir del main actual** para facilitar una revisión
 ## Licencia
 
 Consulta el archivo `LICENSE` del repositorio, si está presente, para conocer los términos aplicables. No se presupone ninguna licencia sin verificarla.
+
+### Buscador único
+El buscador interpreta países y categorías habituales (noticias, deportes, música y géneros). Usa etiquetas de Radio Browser: la clasificación no está verificada y puede faltar. Las búsquedas de términos no reconocidos se tratan como nombres de emisoras.
