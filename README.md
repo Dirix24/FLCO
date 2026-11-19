@@ -1,6 +1,6 @@
 # FLCO · Radio de código abierto
 
-FLCO es una radio web minimalista para escuchar emisoras públicas por Internet, buscar por país o género, guardar favoritos y cambiar entre **canales numerados 1, 2, 3, 4, 5…**. Tiene un dial de **barras azules animadas** y colores que cambian con cada emisora. Estas barras son **decorativas** y no pretenden medir ondas ni interferencias.
+FLCO es una radio web minimalista para escuchar emisoras públicas por Internet, buscar por país o género, guardar favoritos y cambiar entre **canales numerados 1, 2, 3, 4, 5…**. Tiene un dial de **barras azules animadas** y colores que cambian con cada emisora.
 
 **Proyecto desarrollado con asistencia de inteligencia artificial (IA)**, bajo dirección y revisión humana. El código fuente tiene **[licencia MIT](LICENSE)**, que permite usar, estudiar, modificar y redistribuir el software bajo sus condiciones. La licencia del código no concede derechos sobre las emisiones de terceros.
 
@@ -11,9 +11,9 @@ FLCO es una radio web minimalista para escuchar emisoras públicas por Internet,
 - **Con Internet:** buscar emisoras por país, nombre o tema; escucharlas si el flujo es compatible; ver nombre, país, categoría, códec y bitrate cuando el directorio los proporciona; guardar favoritos.
 - **Cambiar de canal:** pulsa el número de una emisora o los botones **Anterior** y **Siguiente**. El dial cambia de color y anima barras azules cuando suena el reproductor.
 - **Sin Internet:** abrir la interfaz desde su caché tras una primera visita compatible y reproducir **archivos de audio locales** con el selector de archivos. Los favoritos guardan enlaces, no grabaciones; las emisoras de Internet **no funcionan offline**.
-- **Móvil:** interfaz adaptable y controles táctiles. La reproducción depende del navegador y el formato.
+- **Ubicación opcional:** pulsa **Radios cerca de mí** y concede permiso. FLCO obtiene el país mediante OpenStreetMap Nominatim y consulta emisoras de ese país en Radio Browser. La búsqueda no mide intensidad RF ni garantiza mejor sonido; los resultados se ordenan por votos del directorio. Se comparten coordenadas con el servicio de geocodificación solo tras tu permiso. Se requiere HTTPS o localhost para geolocalización.\n- **Móvil:** interfaz adaptable y controles táctiles. La reproducción depende del navegador y el formato.
 
-No se muestran ya los gráficos de ondas de audio que fallaban, la televisión ni los paneles de simulación.
+No se muestran ya los gráficos de ondas de audio que fallaban, la televisión ni los paneles de simulación. El diseño usa fondo negro.
 
 ## Instalación y uso por sistema operativo
 
@@ -126,4 +126,4 @@ Las comprobaciones de sintaxis no garantizan la reproducción de todas las radio
 
 ## Licencia, autoría y privacidad
 
-**Código abierto MIT. Desarrollado con asistencia de IA.** Consulta [LICENSE](LICENSE). Los favoritos se guardan localmente en el navegador. Las búsquedas online se envían a Radio Browser. FLCO no necesita permisos de geolocalización para el buscador actual. Los contenidos de terceros conservan sus licencias y condiciones.
+**Código abierto MIT. Desarrollado con asistencia de IA.** Consulta [LICENSE](LICENSE). Los favoritos se guardan localmente en el navegador. Las búsquedas online se envían a Radio Browser. El buscador manual no necesita ubicación; el botón opcional de radios cercanas pide permiso y envía coordenadas a OpenStreetMap Nominatim para obtener el país. Las búsquedas de radios se envían a Radio Browser. Los contenidos de terceros conservan sus licencias y condiciones.
