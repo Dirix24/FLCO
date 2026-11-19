@@ -4,3 +4,5 @@ select{width:100%;font:inherit;background:#0e192b;color:white;border:1px solid #
 input[type=range]{padding:0;accent-color:#55b9e6}#nearby-results{margin-top:1rem}
 
 .station-details{display:flex;flex-direction:column;gap:.25rem;min-width:0;overflow-wrap:anywhere}.station-details small{font-size:.8rem;color:#b3c3d7}#status{margin:.8rem 0;line-height:1.5}.panel form+.hint{margin-top:.75rem}
+
+.browse-actions{flex-wrap:wrap;margin:.75rem 0 1rem}.browse-actions button{flex:1;min-width:110px}#play-tone,#stop-tone{margin:.3rem .3rem .3rem 0}h3{font-size:1rem;margin-top:1.4rem}
