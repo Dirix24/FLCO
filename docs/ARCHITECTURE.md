@@ -55,3 +55,6 @@ Navegador PC / teléfono
 
 ## Prototipo de descubrimiento y simulación
 La rama `feature/flco-spectrum-discovery-phase-3` añade búsqueda por país, consulta opcional por geolocalización a Radio Browser y un espectro matemático con ruido e interferencia simulados. La geolocalización requiere contexto seguro (HTTPS o localhost), consentimiento explícito y conectividad con el directorio. **No se almacenan coordenadas en FLCO**, pero el servicio externo recibe la ubicación enviada para realizar la búsqueda. No se afirma que las emisoras encontradas sean captables por antena. El espectro simulado no representa mediciones reales ni frecuencias calibradas.
+
+## Fase de audio real y multimedia abierta
+Se han retirado de la interfaz los paneles de ondas y espectro simulados. El visualizador usa `HTMLMediaElement.captureStream()` cuando el navegador y las restricciones del flujo permiten obtener muestras, con Web Audio AnalyserNode. Muestra exclusivamente audio de reproducción, no interferencia ni espectro de RF. Las imágenes y vídeos se consultan a Wikimedia Commons, no hay agregación de TV en directo. El código fuente mantiene la licencia MIT existente; los medios de terceros conservan sus propias licencias.
