@@ -24,19 +24,8 @@
        const location=await geoResponse.json();
        const countryCode=String(location.address?.country_code||"").toUpperCase();
        if(!/^[A-Z]{2}$/.test(countryCode))throw new Error("country");
-       const url=new URL("https://de1.api.radio-browser.info/json/stations/search");
-       url.searchParams.set("countrycode",countryCode);
-       url.searchParams.set("countrycodeexact","true");
-       url.searchParams.set("hidebroken","true");
-       url.searchParams.set("limit","100");
-       url.searchParams.set("order","votes");
-       url.searchParams.set("reverse","true");
-       const response=await fetch(url,{signal:controller.signal,headers:{Accept:"application/json"}});
-       if(!response.ok)throw new Error("directory");
-       const stations=await response.json();
-       if(!Array.isArray(stations))throw new Error("stations");
-       const count=window.FLCOShowNearby(stations);
-       info.textContent=count?count+" emisoras del país detectado ("+countryCode+"). Ordenadas por votos del directorio, no por intensidad de antena. Datos de ubicación: © OpenStreetMap contributors.":"No hay emisoras compatibles. Prueba el buscador.";
+       window.FLCOStartCountrySearch(countryCode);
+       info.textContent="Mostrando emisoras del país detectado ("+countryCode+"). Puedes pulsar «Cargar más radios». La cercanía no garantiza mejor calidad de audio. Datos de ubicación: © OpenStreetMap contributors.";
      }catch(_){info.textContent="No se pudo buscar por ubicación. Puedes buscar por país manualmente.";}
      finally{clearTimeout(timer);button.disabled=false;}
    },error=>{
