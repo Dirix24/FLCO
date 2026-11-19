@@ -1,76 +1,54 @@
-# FLCO — Radio inteligente y explorador SDR
+# FLCO — Radio de código abierto
 
-FLCO es un proyecto en desarrollo para **escuchar emisoras por Internet** desde MX Linux, otros ordenadores y teléfonos, y explorar señales abiertas mediante un receptor RTL-SDR. Incluye un pequeño laboratorio de señales **simuladas**.
+FLCO es una radio web minimalista y adaptable a **MX Linux y móviles**. Permite buscar emisoras públicas por Internet, escucharlas, guardar favoritos, consultar metadatos y visualizar las ondas del audio cuando el navegador permite acceder a las muestras. También permite abrir archivos de audio del dispositivo **sin Internet**.
 
-> **Estado:** prototipo. Las funciones web están en esta rama de desarrollo; la recepción SDR continúa como aplicación Python independiente. No hay todavía una versión estable con todas las funciones integradas.
+**Licencia del código: [MIT](LICENSE).** El código es abierto y puede usarse, modificarse y redistribuirse bajo sus condiciones. Las emisiones y contenidos de terceros tienen licencias independientes.
 
-## Funciones disponibles
+## Funciones
 
-| Función | Estado | Requisitos |
-| --- | --- | --- |
-| Buscar emisoras por país, tema o nombre en un solo campo | Prototipo web | Internet; directorio externo Radio Browser |
-| Escuchar emisoras y URL de audio HTTPS | Prototipo web | Navegador compatible con el flujo |
-| Guardar favoritos | Prototipo web | Almacenamiento local del navegador |
-| Generar ondas de prueba (seno, cuadrada, AM y ruido) | Prototipo web | Sin antena; no transmite RF |
-| Espectro e interferencia simulados | Prototipo web | Datos matemáticos, no medición SDR |
-| Buscar emisoras por país o proximidad | Prototipo web | Geolocalización solo con permiso; directorio externo |
-| Medir respuesta HTTP al servidor FLCO | Prototipo web | No mide velocidad real de Internet |
-| Visualizar espectro y waterfall RTL-SDR | Aplicación Python existente | Receptor USB y antena |
-| Escanear frecuencias RTL-SDR | Aplicación Python existente | Receptor USB y antena |
+| Función | Estado |
+| --- | --- |
+| Buscar emisoras por nombre, país o tema en un único campo | Prototipo funcional, depende de Radio Browser |
+| Escuchar emisoras y guardar favoritos | Depende de conexión y compatibilidad del flujo |
+| Mostrar país, categoría, códec y bitrate declarados | Cuando los proporciona el directorio |
+| Ver forma de onda y espectro del audio | Cuando el navegador permite capturar muestras; **no son señales RF** |
+| Botón Volver y diseño móvil | Incluidos |
+| Abrir FLCO sin conexión | Tras una visita inicial con conexión y caché del navegador |
+| Reproducir archivos locales sin conexión | Incluido, formatos compatibles con el navegador |
+| Radio FM real por antena sin Internet | Requiere receptor RTL-SDR USB; no integrado en la web |
 
-**Pendiente:** escuchar FM recibida por antena, analizar interferencias reales, medir descarga/subida, descubrir emisoras según ubicación autorizada, conectar el SDR del ordenador al teléfono y pruebas integrales.
+Se han retirado de la interfaz los paneles de televisión, simulación, pruebas de velocidad y otros controles experimentales. El explorador RTL-SDR Python sigue en el repositorio, independiente de la radio web.
 
-## Probar la radio web en MX Linux
-
-Instala Python y Git si no los tienes:
+## Iniciar en MX Linux
 
 ```bash
 sudo apt update
 sudo apt install git python3
-```
-
-Si **no tienes el repositorio descargado**:
-
-```bash
 git clone https://github.com/Dirix24/FLCO.git
 cd FLCO
 git fetch origin
-git switch --track origin/fix/flco-main-compatible
-```
-
-Si **ya tienes el repositorio descargado**:
-
-```bash
-cd ~/FLCO
-git fetch origin
-git switch --track origin/fix/flco-main-compatible
-```
-
-Si la rama ya existe localmente, usa `git switch fix/flco-main-compatible` y `git pull --ff-only`. Guarda o confirma los cambios locales antes de cambiar de rama.
-
-Inicia la interfaz:
-
-```bash
+git switch --track origin/feature/flco-minimal-radio-mobile
 python3 -m http.server 8000 --directory web
 ```
 
-Abre **http://localhost:8000** en Firefox. Detén el servidor con `Ctrl+C`.
+Si ya tienes el repositorio, sustituye `git clone ...` por `cd ~/FLCO`. Abre `http://localhost:8000` en Firefox y actualiza con `Ctrl+Shift+R`. Para detener el servidor pulsa `Ctrl+C`.
 
-Para abrirlo desde un teléfono en la misma red, utiliza la dirección LAN del ordenador y el puerto 8000. No expongas el servidor de desarrollo a Internet. El navegador móvil puede limitar algunas funciones si la página no usa HTTPS.
+## Escuchar y ver ondas
 
-## Probar el laboratorio web
+Busca una radio y pulsa **Escuchar**. Debajo del reproductor aparecerán sus metadatos. Pulsa **Ver ondas** cuando el audio esté reproduciéndose. El visualizador usa muestras digitales reales y cálculos de amplitud/espectro; algunos flujos externos no permiten que el navegador capture su audio. Si ocurre, se informa y no se inventan ondas ni interferencias. **No se miden radiofrecuencia, cobertura ni dBm**.
 
-En la página:
-1. Escribe «España», «noticias de España», «deportes» o un nombre en el buscador único y pulsa **Buscar radios**. Los resultados muestran etiquetas orientativas de Noticias, Deportes, Música o categoría no confirmada. Pulsa **Escuchar**. Algunas estaciones no reproducen audio por formatos incompatibles o enlaces caídos.
-2. Guarda una emisora en **Favoritos**.
-3. En **Laboratorio de señales simuladas**, selecciona una onda, cambia la frecuencia y pulsa **Generar señal**.
-4. En **Explorador de espectro simulado**, cambia el ruido y observa la interferencia matemática.
-5. Busca por país o usa **Buscar usando mi ubicación** únicamente si quieres compartir coordenadas con Radio Browser. En Firefox, geolocalización suele exigir HTTPS o localhost.
-6. En **Comprobar respuesta de conexión**, pulsa **Medir respuesta HTTP**. Si usas localhost, el resultado refleja principalmente el servidor local, no tu conexión a Internet.
+## Uso sin Internet
 
-## Explorador RTL-SDR existente (independiente)
+1. Abre FLCO al menos una vez con conexión desde `http://localhost:8000` o un sitio HTTPS y espera a que el navegador guarde los archivos básicos mediante Service Worker.
+2. Después puedes volver a abrir la página desde la misma dirección, siempre que el navegador conserve su caché y la aplicación esté disponible en ese origen.
+3. En **Sin Internet**, selecciona un archivo de audio del teléfono u ordenador y reprodúcelo. Los archivos locales no se suben al servidor.
+4. Los favoritos siguen visibles si el almacenamiento del navegador se conserva, pero las emisoras de Internet **no pueden emitir sin conexión**.
 
-Para esta función necesitas un receptor RTL-SDR USB, antena y controladores compatibles. No es necesario instalar estas dependencias para la radio web.
+**Importante:** un servidor local en MX Linux puede funcionar sin salida a Internet mientras el ordenador siga encendido. En el móvil, la primera visita a la dirección local requiere conexión con el ordenador; la caché offline depende del navegador. Sin receptor RTL-SDR, FLCO no puede sintonizar radio FM por antena.
+
+## Explorador RTL-SDR independiente
+
+El repositorio conserva `opensdr_explorer.py` para uso con un RTL-SDR USB. Requiere hardware, controladores y dependencias del sistema:
 
 ```bash
 python3 -m venv .venv
@@ -79,62 +57,19 @@ pip install -r requirements.txt
 python opensdr_explorer.py
 ```
 
-Comandos: `freq 100.5`, `scan 88 108`, `help`, `quit`.
+No hay todavía un puente seguro entre el receptor y la interfaz web.
 
-Este programa representa señales y potencia relativa; **todavía no reproduce audio FM**. Las mejoras de estabilidad se revisan en el [PR #1](https://github.com/Dirix24/FLCO/pull/1).
-
-## Organización
-
-```text
-FLCO/
-├── opensdr_explorer.py       # Explorador SDR original
-├── requirements.txt          # Dependencias SDR
-├── web/
-│   ├── index.html            # Radio y laboratorio web
-│   ├── app.js                # Búsqueda, audio, favoritos
-│   ├── explore.js            # Espectro simulado y emisoras próximas
-│   ├── lab.js                # Señales simuladas y respuesta HTTP
-│   ├── styles.css
-│   └── README.md
-├── docs/ARCHITECTURE.md      # Arquitectura y fases
-└── .github/workflows/web-checks.yml
-```
-
-## Comprobar sintaxis
-
-Con Node.js instalado:
+## Verificación
 
 ```bash
 node --check web/app.js
-node --check web/lab.js
-node --check web/explore.js
+node --check web/live-media.js
+node --check web/offline.js
+node --check web/sw.js
 ```
 
-Estas comprobaciones no sustituyen las pruebas de audio, navegadores o hardware. La integración continua comprueba la sintaxis JavaScript.
+La sintaxis no sustituye pruebas reales en Firefox, Android y iPhone. La compatibilidad de análisis de audio varía por navegador y emisora.
 
-## Próximas fases
+## Privacidad y contribuciones
 
-1. Estabilizar la radio web y comprobarla en MX Linux y teléfonos.
-2. Integrar recepción y reproducción de audio FM con RTL-SDR.
-3. Medir señales e interferencias reales y representar espectro y waterfall en la web.
-4. Añadir pruebas voluntarias de velocidad de red y latencia.
-5. Ofrecer búsqueda por ciudad y ubicación opcional con permiso.
-6. Ampliar el laboratorio con análisis espectral y señales digitales.
-7. Crear una API local autenticada para acceder al receptor conectado al ordenador.
-
-Consulta [la arquitectura](docs/ARCHITECTURE.md).
-
-## Seguridad y privacidad
-
-FLCO no solicita ubicación en la versión actual. Los favoritos se guardan localmente. Las búsquedas utilizan un servicio externo y la reproducción conecta con las emisoras seleccionadas. El laboratorio genera señales matemáticas en memoria: **no transmite radiofrecuencia**. Utiliza el receptor SDR únicamente para emisiones legalmente accesibles.
-
-## Desarrollo
-
-Esta rama se ha creado **a partir del main actual** para facilitar una revisión sin arrastrar conflictos del historial anterior. No se fusionará automáticamente.
-
-## Licencia
-
-Consulta el archivo `LICENSE` del repositorio, si está presente, para conocer los términos aplicables. No se presupone ninguna licencia sin verificarla.
-
-### Buscador único
-El buscador interpreta países y categorías habituales (noticias, deportes, música y géneros). Usa etiquetas de Radio Browser: la clasificación no está verificada y puede faltar. Las búsquedas de términos no reconocidos se tratan como nombres de emisoras.
+Las búsquedas de emisoras consultan el directorio externo Radio Browser. Los favoritos se guardan en el navegador. Los archivos locales se reproducen mediante URL temporal del dispositivo sin subirse. No se solicita ubicación en esta versión. Puedes revisar el código y contribuir mediante GitHub. **No hay fusiones automáticas a `main`.**

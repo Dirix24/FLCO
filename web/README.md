@@ -1,38 +1,11 @@
-# FLCO Radio — fase 1 (prototipo)
+# FLCO Web — radio minimalista
 
-Interfaz adaptable a ordenadores y teléfonos para buscar y escuchar emisoras públicas por Internet.
+Interfaz responsive para móvil y MX Linux. Buscador único de radios, favoritos, reproducción de audio, metadatos de emisoras y gráficos del audio capturable por el navegador. Sin televisión ni paneles simulados.
 
-## Iniciar
-Desde la raíz del repositorio:
+`python3 -m http.server 8000 --directory web` y abrir `http://localhost:8000`.
 
-```bash
-python -m http.server 8000 --directory web
-```
+El Service Worker guarda archivos básicos de la interfaz después de una primera visita online, para poder reabrirla sin conexión en navegadores compatibles. La escucha sin Internet usa archivos de audio locales, no emisoras remotas. Los favoritos no almacenan grabaciones. El audio de emisoras puede impedir su análisis por restricciones del navegador; nunca se inventan ondas. Para radio FM por antena se necesita un receptor RTL-SDR.
 
-Abre `http://localhost:8000` en el ordenador. Para abrirla desde el teléfono, ambos dispositivos deben estar en la misma red y debes usar la dirección LAN del ordenador (por ejemplo, `http://IP-DEL-ORDENADOR:8000`). **No expongas este servidor de desarrollo a Internet**. En móvil, el audio por HTTP puede tener restricciones; para desplegarlo públicamente utiliza HTTPS.
+Licencia del código: [MIT](../LICENSE). Los medios de terceros mantienen sus propias licencias.
 
-## Funciones
-- Buscar emisoras mediante Radio Browser (servicio de terceros).
-- Reproducir flujos HTTPS compatibles con el navegador.
-- Introducir una URL de audio manualmente.
-- Guardar favoritos en el navegador mediante localStorage.
-- Interfaz adaptable a pantallas pequeñas.
-- Búsqueda opcional por país y por proximidad geográfica con consentimiento; las coordenadas se envían a Radio Browser y no se guardan localmente.
-- Espectro simulado con señales y ruido, sin SDR ni calibración RF.
-- Laboratorio de señales sintéticas: seno, cuadrada, AM y ruido; no transmite RF.
-- Prueba voluntaria de tiempo de respuesta HTTP al propio servidor; no mide descarga/subida ni ping de Internet.
-
-## Límites
-El directorio externo y los flujos pueden fallar o estar bloqueados. No todas las URLs son archivos de audio compatibles. No hay soporte de listas M3U/PLS, autenticación, receptor SDR web, medidor real de velocidad de red, recepción de RF en la web ni transmisión RF todavía.
-
-## Verificaciones
-```bash
-node --check web/app.js
-node --check web/lab.js
-node --check web/explore.js
-python -m unittest discover -s tests -v
-```
-Revisar manualmente búsqueda, reproducción, errores de red, favoritos, navegación por teclado y visualización en móvil. Estas comprobaciones deben realizarse antes de declarar estable la fase 1.
-
-## Buscador único
-Escribe «España», «noticias de España», «deportes» o «rock México» en el mismo campo. FLCO interpreta países y géneros comunes y muestra la categoría según las etiquetas del directorio externo, que pueden ser incompletas o erróneas. Para búsquedas no reconocidas se busca por nombre de emisora. El ruido simulado no tiene frecuencia tonal.
+Verificar sintaxis: `node --check web/app.js && node --check web/live-media.js && node --check web/offline.js && node --check web/sw.js`.

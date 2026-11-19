@@ -1,46 +1,6 @@
 "use strict";
-// Visualización educativa: ninguna muestra procede de un receptor físico.
 (function () {
   const $ = id => document.getElementById(id);
-  const canvas = $("spectrum-canvas");
-  if (!canvas) return;
-  const ctx = canvas.getContext("2d");
-  function gaussian(x, center, width) {
-    const d = (x - center) / width;
-    return Math.exp(-0.5 * d * d);
-  }
-  function render() {
-    const noise = Number($("interference").value) / 100;
-    const values = new Float32Array(380);
-    for (let i = 0; i < values.length; i++) {
-      const x = i / (values.length - 1);
-      const floor = 0.06 + noise * 0.26 + Math.random() * (0.07 + noise * 0.18);
-      const stationA = 0.65 * gaussian(x, 0.23, 0.012);
-      const stationB = 0.49 * gaussian(x, 0.58, 0.022);
-      const interference = noise * 0.7 * gaussian(x, 0.60, 0.05);
-      values[i] = Math.min(1, floor + stationA + stationB + interference);
-    }
-    ctx.fillStyle = "#0e192b";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = "#41516b";
-    ctx.lineWidth = 1;
-    for (let i = 1; i < 5; i++) {
-      const y = canvas.height * i / 5;
-      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
-    }
-    ctx.strokeStyle = "#55b9e6";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    values.forEach((value, i) => {
-      const x = i / (values.length - 1) * canvas.width;
-      const y = (1 - value) * (canvas.height - 12) + 6;
-      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-    });
-    ctx.stroke();
-    $("spectrum-info").textContent = `Simulación: ruido ${Math.round(noise * 100)}%; dos señales de prueba y una interferencia solapada. Potencia relativa sin calibración; no son MHz ni dBm reales.`;
-  }
-  $("simulate-spectrum").addEventListener("click", render);
-
   const nearbyButton = $("nearby-stations");
   nearbyButton.addEventListener("click", () => {
     const output = $("nearby-info");
