@@ -16,6 +16,8 @@
 | Espectro FFT y waterfall con RTL-SDR | MVP existente | Script Python independiente; requiere hardware |
 | Escaneo de frecuencias con RTL-SDR | MVP existente | Detecta niveles relativos, no identifica emisoras automáticamente |
 | Escuchar audio FM captado por RTL-SDR | Pendiente | La función de demodulación existente no constituye un reproductor completo |
+| Laboratorio de señales sintéticas (onda, AM, ruido) | Prototipo | Solo simulación digital, sin RF |
+| Tiempo de respuesta HTTP al servidor web | Prototipo | No mide velocidad de Internet; localhost es local |
 | Detección y análisis de interferencias | Pendiente | Se desarrollará con DSP y pruebas |
 | Velocidad de conexión y latencia | Pendiente | Distinta de la potencia de una señal de radio |
 | Emisoras sugeridas por ubicación | Pendiente | Consentimiento explícito y búsqueda manual alternativa |
@@ -73,6 +75,7 @@ FLCO/
 ├── web/
 │   ├── index.html            # Interfaz de radio por Internet
 │   ├── styles.css
+│   ├── lab.js              # Simulador y prueba HTTP
 │   ├── app.js
 │   └── README.md             # Instrucciones de la interfaz
 ├── docs/
@@ -83,7 +86,7 @@ FLCO/
 
 ## Plan de desarrollo
 
-1. **Radio por Internet:** búsqueda, reproducción, favoritos y experiencia móvil.
+1. **Radio por Internet:** búsqueda, reproducción, favoritos y experiencia móvil; simulador y respuesta HTTP básica añadidos como prototipos.
 2. **Radio por antena:** estabilizar el SDR, añadir demodulación y audio FM real.
 3. **Espectro e interferencias:** mediciones de ruido, señales y ocupación de bandas.
 4. **Conexión:** velocidad, latencia y estabilidad de Internet; métricas inalámbricas solo cuando el dispositivo lo permita.
