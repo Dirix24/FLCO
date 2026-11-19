@@ -61,3 +61,6 @@ Se han retirado de la interfaz los paneles de ondas y espectro simulados. El vis
 
 ## Canales y pruebas de red
 `web/channels.js` muestra enlaces a portales oficiales por país con numeración interna, sin reproducir ni redistribuir televisión. Incluye una transferencia pequeña de descarga HTTP desde el propio servidor y un intento de POST para subida, que necesita un backend compatible. Estos datos no equivalen a una medición fiable de velocidad de Internet. La captura de audio externo sigue condicionada por permisos de origen; el fallback muestra metadatos de la emisora sin generar datos de RF ficticios. La integración SDR por antena sigue pendiente.
+
+## Interfaz minimalista offline
+La rama `feature/flco-minimal-radio-mobile` usa `web/index.html`, `app.js`, `live-media.js`, `offline.js`, `sw.js` y `styles.css`. Se eliminan de la interfaz las secciones de TV y pruebas de red; la interfaz puede almacenarse mediante Service Worker en origen seguro y reproduce archivos locales sin Internet. El visualizador se basa en muestras reales del audio cuando `captureStream` está disponible y el origen del flujo lo permite; no simula RF. La integración SDR real permanece separada.
