@@ -28,7 +28,7 @@
     if (active) return;
     const AC=window.AudioContext||window.webkitAudioContext;
     if (!AC || typeof player.captureStream !== "function") {
-      $("live-info").textContent="Este navegador no permite capturar las muestras de este reproductor. La radio puede seguir escuchándose normalmente.";
+      $("live-info").textContent="La radio puede seguir escuchándose. El navegador no permite obtener muestras para dibujar ondas reales; se muestran los datos disponibles de la emisora.";
       return;
     }
     try {
@@ -45,7 +45,7 @@
       active=true;
       draw();
     } catch (_) {
-      $("live-info").textContent="No se puede analizar este flujo. Algunos formatos o restricciones del navegador impiden leer el audio.";
+      $("live-info").textContent="La radio puede seguir escuchándose. Este flujo no permite leer sus muestras de audio; no se dibujarán ondas inventadas. Consulta los datos de la emisora.";
     }
   });
   $("stop-visualizer").addEventListener("click", () => {
