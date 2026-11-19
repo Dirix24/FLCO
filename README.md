@@ -27,19 +27,19 @@ Necesitas un receptor SDR compatible, por ejemplo:
 
 ### Software
 
-- Python 3.9 o superior recomendado
+- Python 3.9 o superior
 - NumPy
 - Matplotlib
 - pyrtlsdr
-- SoundDevice (opcional para futuras funciones de audio)
+- SoundDevice (opcional; no es necesario para el espectro y el escaneo)
 
 ## Instalación
 
 Clona tu repositorio:
 
 ```bash
-git clone TU_REPOSITORIO
-cd opensdr-explorer
+git clone https://github.com/Dirix24/FLCO.git
+cd FLCO
 ```
 
 Crea un entorno virtual:
@@ -134,6 +134,18 @@ Después:
 4. Se representa el espectro.
 5. Se añaden las nuevas líneas al waterfall.
 6. Se buscan picos por encima de un umbral relativo.
+
+## Comprobaciones sin hardware
+
+Puedes comprobar la sintaxis y la validación de frecuencias con la biblioteca estándar:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+Estas pruebas **no sustituyen** una validación con un RTL-SDR físico. El rango de sintonización admitido por el programa es orientativo (24–1766 MHz); depende del receptor concreto.
+
+El escaneo es bloqueante mientras mantiene el acceso exclusivo al receptor y restaura la frecuencia anterior al finalizar. No se recomienda utilizar el dispositivo desde otros programas simultáneamente.
 
 ## Limitaciones actuales
 
