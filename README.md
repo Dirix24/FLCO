@@ -12,6 +12,8 @@ FLCO es un proyecto en desarrollo para **escuchar emisoras por Internet** desde 
 | Escuchar emisoras y URL de audio HTTPS | Prototipo web | Navegador compatible con el flujo |
 | Guardar favoritos | Prototipo web | Almacenamiento local del navegador |
 | Generar ondas de prueba (seno, cuadrada, AM y ruido) | Prototipo web | Sin antena; no transmite RF |
+| Espectro e interferencia simulados | Prototipo web | Datos matemáticos, no medición SDR |
+| Buscar emisoras por país o proximidad | Prototipo web | Geolocalización solo con permiso; directorio externo |
 | Medir respuesta HTTP al servidor FLCO | Prototipo web | No mide velocidad real de Internet |
 | Visualizar espectro y waterfall RTL-SDR | Aplicación Python existente | Receptor USB y antena |
 | Escanear frecuencias RTL-SDR | Aplicación Python existente | Receptor USB y antena |
@@ -62,7 +64,9 @@ En la página:
 1. Busca una emisora y pulsa **Escuchar**. Algunas estaciones no reproducen audio por formatos incompatibles o enlaces caídos.
 2. Guarda una emisora en **Favoritos**.
 3. En **Laboratorio de señales simuladas**, selecciona una onda, cambia la frecuencia y pulsa **Generar señal**.
-4. En **Comprobar respuesta de conexión**, pulsa **Medir respuesta HTTP**. Si usas localhost, el resultado refleja principalmente el servidor local, no tu conexión a Internet.
+4. En **Explorador de espectro simulado**, cambia el ruido y observa la interferencia matemática.
+5. Busca por país o usa **Buscar usando mi ubicación** únicamente si quieres compartir coordenadas con Radio Browser. En Firefox, geolocalización suele exigir HTTPS o localhost.
+6. En **Comprobar respuesta de conexión**, pulsa **Medir respuesta HTTP**. Si usas localhost, el resultado refleja principalmente el servidor local, no tu conexión a Internet.
 
 ## Explorador RTL-SDR existente (independiente)
 
@@ -88,6 +92,7 @@ FLCO/
 ├── web/
 │   ├── index.html            # Radio y laboratorio web
 │   ├── app.js                # Búsqueda, audio, favoritos
+│   ├── explore.js            # Espectro simulado y emisoras próximas
 │   ├── lab.js                # Señales simuladas y respuesta HTTP
 │   ├── styles.css
 │   └── README.md
@@ -102,6 +107,7 @@ Con Node.js instalado:
 ```bash
 node --check web/app.js
 node --check web/lab.js
+node --check web/explore.js
 ```
 
 Estas comprobaciones no sustituyen las pruebas de audio, navegadores o hardware. La integración continua comprueba la sintaxis JavaScript.
