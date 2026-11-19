@@ -52,3 +52,6 @@ Navegador PC / teléfono
 - Solo se aceptan flujos HTTPS para evitar contenido mixto en despliegues HTTPS; algunos formatos no son compatibles con HTMLAudioElement.
 - Los favoritos se guardan en el navegador, no se sincronizan entre dispositivos.
 - No hay backend ni transmisión de radio.
+
+## Prototipo de descubrimiento y simulación
+La rama `feature/flco-spectrum-discovery-phase-3` añade búsqueda por país, consulta opcional por geolocalización a Radio Browser y un espectro matemático con ruido e interferencia simulados. La geolocalización requiere contexto seguro (HTTPS o localhost), consentimiento explícito y conectividad con el directorio. **No se almacenan coordenadas en FLCO**, pero el servicio externo recibe la ubicación enviada para realizar la búsqueda. No se afirma que las emisoras encontradas sean captables por antena. El espectro simulado no representa mediciones reales ni frecuencias calibradas.

@@ -8,13 +8,14 @@
 <link rel="stylesheet" href="styles.css">
 <script src="app.js" defer></script>
 <script src="lab.js" defer></script>
+<script src="explore.js" defer></script>
 </head>
 <body>
 <header><h1>📻 FLCO Radio</h1><p>Emisoras abiertas, desde tu ordenador o teléfono</p></header>
 <main>
 <section class="panel">
 <h2>Buscar emisoras</h2>
-<form id="search-form"><label for="query">Nombre o palabra clave</label><div class="horizontal"><input id="query" type="search" placeholder="Noticias, jazz, Radio..." required maxlength="100"><button type="submit">Buscar</button></div></form>
+<form id="search-form"><label for="query">¿Qué radio quieres escuchar?</label><div class="horizontal"><input id="query" type="search" placeholder="Noticias de España, deportes, música, España..." required maxlength="100" autocomplete="off"><button type="submit">Buscar radios</button></div></form><p class="hint">Un solo buscador: escribe un país, una categoría, una emisora o ambos. Ejemplos: «España», «noticias de España», «deportes», «rock México».</p>
 <p class="hint">Los resultados dependen de un directorio externo. Las emisoras pueden cambiar o dejar de emitir.</p>
 <div id="status" role="status" aria-live="polite"></div>
 <ul id="results" class="stations"></ul>
@@ -36,7 +37,7 @@
 <p class="hint">Genera una señal digital de prueba y visualiza su forma de onda. No emite radiofrecuencia ni utiliza antena.</p>
 <label for="waveform">Tipo de señal</label>
 <select id="waveform"><option value="sine">Senoidal</option><option value="square">Cuadrada</option><option value="am">AM simulada</option><option value="noise">Ruido</option></select>
-<label for="signal-frequency">Frecuencia de prueba (Hz)</label>
+<label for="signal-frequency">Frecuencia de la onda (Hz; no afecta al ruido)</label>
 <input id="signal-frequency" type="number" min="10" max="2000" step="10" value="440">
 <button id="generate-signal" type="button">Generar señal</button>
 <canvas id="signal-canvas" width="760" height="220" role="img" aria-label="Gráfico de forma de onda simulada"></canvas>
@@ -48,7 +49,23 @@
 <button id="test-latency" type="button">Medir respuesta HTTP</button>
 <p id="latency-info" role="status" aria-live="polite">Prueba sin iniciar.</p>
 </section>
+<section class="panel">
+<h2>Explorador de espectro simulado</h2>
+<p class="hint">Simula señales, ruido y solapamientos. Los resultados NO son mediciones de antena ni permiten identificar emisoras reales.</p>
+<label for="interference">Nivel de ruido e interferencia simulados</label>
+<input id="interference" type="range" min="0" max="100" value="30" step="5">
+<button type="button" id="simulate-spectrum">Simular espectro</button>
+<canvas id="spectrum-canvas" width="760" height="260" role="img" aria-label="Espectro de señales simuladas"></canvas>
+<p id="spectrum-info" role="status" aria-live="polite">Pulsa Simular espectro.</p>
+</section>
+<section class="panel">
+<h2>Emisoras según tu zona (opcional)</h2>
+<p class="hint">Puedes buscar emisoras por país desde el buscador superior. Si permites usar tu ubicación, FLCO consultará el directorio público por proximidad. La ubicación no se guarda en FLCO; el proveedor externo recibirá las coordenadas de la búsqueda. Encontrar una emisora cercana no garantiza recepción FM.</p>
+<button type="button" id="nearby-stations">Buscar usando mi ubicación</button>
+<p id="nearby-info" role="status" aria-live="polite">Ubicación desactivada.</p>
+<ul id="nearby-results" class="stations"></ul>
+</section>
 <section class="panel"><h2>Próximas funciones</h2><p>Audio FM RTL-SDR · Interferencias reales · Velocidad de descarga/subida · Ubicación voluntaria · API segura de SDR</p><p class="hint">Estas funciones aún no están implementadas en la interfaz web.</p></section>
 </main>
-<footer>FLCO · Solo recepción de emisiones públicas y accesibles legalmente · La ubicación no se solicita en esta fase</footer>
+<footer>FLCO · Solo recepción de emisiones públicas y accesibles legalmente · La ubicación solo se solicita si pulsas el botón correspondiente</footer>
 </body></html>

@@ -45,7 +45,7 @@
     const type = $("waveform").value;
     if (!["sine", "square", "am", "noise"].includes(type)) return;
     draw(generate(type, hz));
-    $("signal-info").textContent = `Señal ${type} de prueba: ${hz} Hz; 760 muestras sintéticas a 16 kHz. No se transmite RF.`;
+    $("signal-info").textContent = type === "noise" ? "Ruido aleatorio de prueba: 760 muestras sintéticas a 16 kHz. La frecuencia indicada no se aplica al ruido. No se transmite RF." : `Señal ${type} de prueba: ${hz} Hz; 760 muestras sintéticas a 16 kHz. No se transmite RF.`;
   });
   $("test-latency").addEventListener("click", async () => {
     const button = $("test-latency");
