@@ -15,3 +15,8 @@ node --check web/live-media.js
 ```
 
 Licencia del **código**: [MIT](../LICENSE). No cubre contenido de terceros.
+
+## Televisión y red
+En **Televisión abierta y canales**, selecciona un país para ver portales oficiales numerados. Los enlaces se abren fuera de FLCO; no garantizan emisión en directo ni disponibilidad territorial. Los datos de radio son metadatos del directorio, no RF. La descarga desde el servidor web es una prueba pequeña y orientativa; la subida requiere un servidor POST (no incluido en `python3 -m http.server`). En localhost no se mide Internet.
+
+`node --check web/channels.js`
