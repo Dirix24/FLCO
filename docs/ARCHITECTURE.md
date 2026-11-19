@@ -58,3 +58,6 @@ La rama `feature/flco-spectrum-discovery-phase-3` añade búsqueda por país, co
 
 ## Fase de audio real y multimedia abierta
 Se han retirado de la interfaz los paneles de ondas y espectro simulados. El visualizador usa `HTMLMediaElement.captureStream()` cuando el navegador y las restricciones del flujo permiten obtener muestras, con Web Audio AnalyserNode. Muestra exclusivamente audio de reproducción, no interferencia ni espectro de RF. Las imágenes y vídeos se consultan a Wikimedia Commons, no hay agregación de TV en directo. El código fuente mantiene la licencia MIT existente; los medios de terceros conservan sus propias licencias.
+
+## Canales y pruebas de red
+`web/channels.js` muestra enlaces a portales oficiales por país con numeración interna, sin reproducir ni redistribuir televisión. Incluye una transferencia pequeña de descarga HTTP desde el propio servidor y un intento de POST para subida, que necesita un backend compatible. Estos datos no equivalen a una medición fiable de velocidad de Internet. La captura de audio externo sigue condicionada por permisos de origen; el fallback muestra metadatos de la emisora sin generar datos de RF ficticios. La integración SDR por antena sigue pendiente.
