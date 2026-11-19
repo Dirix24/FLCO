@@ -8,7 +8,7 @@ FLCO es una radio web minimalista para escuchar emisoras públicas por Internet,
 
 ## Qué puedes hacer
 
-- **Con Internet:** buscar emisoras por país, nombre o tema; escucharlas si el flujo es compatible; ver nombre, país, categoría, códec y bitrate cuando el directorio los proporciona; guardar favoritos.
+- **Con Internet:** buscar emisoras de todo el mundo con el botón «🌍 Radios de todo el mundo» y ampliar resultados con «Cargar más radios» (60 visibles por tanda, hasta agotar el directorio); buscar emisoras por país, nombre o tema; escucharlas si el flujo es compatible; ver nombre, país, categoría, códec y bitrate cuando el directorio los proporciona; guardar favoritos.
 - **Cambiar de canal:** pulsa el número de una emisora o los botones **Anterior** y **Siguiente**. El dial cambia de color y anima barras azules cuando suena el reproductor.
 - **Sin Internet:** abrir la interfaz desde su caché tras una primera visita compatible y reproducir **archivos de audio locales** con el selector de archivos. Los favoritos guardan enlaces, no grabaciones; las emisoras de Internet **no funcionan offline**.
 - **Ubicación opcional:** pulsa **Radios cerca de mí** y concede permiso. FLCO obtiene el país mediante OpenStreetMap Nominatim y consulta emisoras de ese país en Radio Browser. La búsqueda no mide intensidad RF ni garantiza mejor sonido; los resultados se ordenan por votos del directorio. Se comparten coordenadas con el servicio de geocodificación solo tras tu permiso. Se requiere HTTPS o localhost para geolocalización.\n- **Móvil:** interfaz adaptable y controles táctiles. La reproducción depende del navegador y el formato.
@@ -77,7 +77,7 @@ Si cuentan con navegador moderno y un servidor HTTP que sirva la carpeta `web`, 
 ## Uso diario
 
 1. Arranca el servidor y abre FLCO.
-2. Escribe un país, «noticias», «música» o el nombre de una emisora y pulsa **Buscar**.
+2. Escribe un país, «noticias», «música» o el nombre de una emisora y pulsa **Buscar**, o pulsa **🌍 Radios de todo el mundo**. Usa **Cargar más radios** para consultar nuevas páginas del directorio.
 3. En los resultados numerados pulsa **1, 2, 3…** o **Escuchar**.
 4. Cambia de emisora con **Anterior** o **Siguiente**. Los colores y barras cambian con el canal; no indican intensidad RF.
 5. Usa **☆ Guardar** para favoritos y **← Volver** para regresar.
