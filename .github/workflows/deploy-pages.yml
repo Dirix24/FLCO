@@ -31,6 +31,26 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./web
+      # En algunas ejecuciones la API de artefactos tarda unos segundos en
+      # hacer visible el ZIP, aunque upload-pages-artifact ya haya terminado.
+      - name: Esperar a que GitHub registre el artefacto de Pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.run_id }}
+          REPO: ${{ github.repository }}
+        run: |
+          for intento in {1..12}; do
+            count=$(gh api "repos/$REPO/actions/runs/$RUN_ID/artifacts" \
+              --jq '[.artifacts[] | select(.name == "github-pages" and .expired == false)] | length')
+            if [ "$count" -ge 1 ]; then
+              echo "Artefacto github-pages disponible."
+              exit 0
+            fi
+            echo "Artefacto todavía no visible (intento $intento/12); reintentando..."
+            sleep 5
+          done
+          echo "::error::GitHub no ha registrado el artefacto github-pages."
+          exit 1
       - name: Publicar GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
