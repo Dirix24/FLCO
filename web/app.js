@@ -29,6 +29,8 @@ function play(station) {
   player.pause();
   player.src = url;
   player.load();
+  const info = $("station-details");
+  if (info) info.textContent = [clean(station.category) || "Categoría no confirmada",clean(station.country),clean(station.codec) ? "Códec: " + station.codec : "",station.bitrate ? "Bitrate declarado: " + station.bitrate + " kbps" : ""].filter(Boolean).join(" · ") + " · Flujo: " + url + " · Estos datos son del directorio, no mediciones RF.";
   player.play().catch(() => status("Pulsa reproducir en el control de audio. Comprueba que el formato sea compatible."));
 }
 function stationRow(station, target, favoriteMode = false) {
@@ -149,7 +151,7 @@ $("search-form").addEventListener("submit", async (event) => {
       for (const s of stations) {
         const url = safeStream(s.url_resolved || s.url);
         if (!url) continue;
-        const station = {name: clean(s.name), url, country: clean(s.country), tags: clean(s.tags), category: category(s)};
+        const station = {name: clean(s.name), url, country: clean(s.country), tags: clean(s.tags), category: category(s), codec: clean(s.codec), bitrate: Number(s.bitrate) || 0};
         if (!unique.has(url)) unique.set(url, station);
       }
       if (unique.size >= 30) break;
