@@ -228,18 +228,29 @@ function displayDirectory(rows, label) {
     ? stationList.length + " emisoras online · " + label + ". No es recepción FM por antena."
     : "No se encontraron emisoras online HTTPS para " + label + ".");
 }
-async function exploreWorld() {
+let worldOffset = 0;
+let worldQuery = null;
+const WORLD_PAGE_SIZE = 100;
+async function exploreWorld(loadMore = false) {
   if (currentRequest) currentRequest.abort();
   const request = new AbortController();
   currentRequest = request;
-  status("Consultando emisoras de todo el mundo…");
-  const country = clean($("world-country").value);
-  const genre = $("world-genre").value;
+  const button = $("world-more");
+  if (!loadMore) {
+    worldOffset = 0;
+    worldQuery = {country: clean($("world-country").value), genre: $("world-genre").value};
+    stationList = [];
+    $("results").replaceChildren();
+  }
+  button.hidden = true;
+  status(loadMore ? "Cargando más emisoras mundiales…" : "Consultando el catálogo mundial de emisoras online…");
+  const {country, genre} = worldQuery;
   const url = new URL(DIRECTORY);
   if (country) url.searchParams.set("country", country);
   if (genre) url.searchParams.set("tag", genre);
   url.searchParams.set("hidebroken", "true");
-  url.searchParams.set("limit", "100");
+  url.searchParams.set("limit", String(WORLD_PAGE_SIZE));
+  url.searchParams.set("offset", String(worldOffset));
   url.searchParams.set("order", "votes");
   url.searchParams.set("reverse", "true");
   try {
@@ -248,14 +259,30 @@ async function exploreWorld() {
     const rows = await response.json();
     if (!Array.isArray(rows)) throw new Error("Respuesta inválida");
     if (request !== currentRequest) return;
-    displayDirectory(rows, [country || "todos los países", genre || "todos los géneros"].join(" · "));
+    const known = new Set(stationList.map(station => station.url));
+    const target = $("results");
+    for (const entry of rows) {
+      const station = stationFromDirectory(entry);
+      if (!station || known.has(station.url)) continue;
+      known.add(station.url);
+      stationList.push(station);
+      stationRow(station, target, false, stationList.length);
+    }
+    worldOffset += rows.length;
+    button.hidden = rows.length < WORLD_PAGE_SIZE;
+    status(stationList.length
+      ? stationList.length + " emisoras online cargadas · " + (country || "todos los países") + " · " + (genre || "todos los géneros") + ". Pulsa «Cargar más» para seguir explorando. No son señales FM captadas por antena."
+      : "No se encontraron emisoras HTTPS en el directorio para estos filtros.");
   } catch (error) {
-    if (error.name !== "AbortError" && request === currentRequest)
-      status("No se pudo cargar el directorio mundial. Comprueba la conexión.");
+    if (error.name !== "AbortError" && request === currentRequest) {
+      button.hidden = worldOffset === 0;
+      status("No se pudo cargar el catálogo mundial. Comprueba Internet y vuelve a intentarlo.");
+    }
   }
 }
-$("world-radios").addEventListener("click", exploreWorld);
-$("apply-world-filters").addEventListener("click", exploreWorld);
+$("world-radios").addEventListener("click", () => exploreWorld(false));
+$("apply-world-filters").addEventListener("click", () => exploreWorld(false));
+$("world-more").addEventListener("click", () => exploreWorld(true));
 
 function distanceKm(lat1, lon1, lat2, lon2) {
   const rad = Math.PI / 180;
