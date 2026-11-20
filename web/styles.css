@@ -39,3 +39,5 @@ canvas{background:#050505;border:1px solid #8b8b82}
 .dial-bars i{background:var(--flco-accent);box-shadow:0 0 9px #e9dba066}
 footer{border-top:1px solid #66665f}
 @media(max-width:600px){.panel{border-left-width:2px}}
+
+.radio-filters{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:.6rem;margin:1rem 0;align-items:center}.radio-filters label{font-weight:600}.radio-filters input,.radio-filters select{min-width:0;width:100%;padding:.65rem;border-radius:8px;background:#080808;color:#fff;border:1px solid #aaa99e}.radio-filters button{grid-column:1/-1}.channel-nav{flex-wrap:wrap}@media(max-width:600px){.radio-filters{grid-template-columns:1fr}}
