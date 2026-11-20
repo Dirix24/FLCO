@@ -151,3 +151,29 @@ Abre **http://127.0.0.1:8000/** en el mismo equipo, busca la sección **FM por a
 **Requisitos y límites:** se necesitan `rtl_fm`, `ffmpeg` con codificador `libmp3lame`, un dispositivo RTL-SDR compatible y permisos de acceso USB. Algunos equipos requieren configurar reglas udev o descargar un controlador que esté ocupando el dispositivo. La recepción puede fallar si no hay antena o señal. Solo se ha implementado FM de radiodifusión, no AM. Este servidor no da acceso remoto ni puede utilizar el receptor FM integrado de un móvil. No se ha verificado aún la calidad del audio ni la compatibilidad de todos los modelos.
 
 Comprobaciones sin antena: `python3 -m py_compile fm_server.py`, `node --check web/fm.js`. Para verificar recepción real, hay que conectar hardware y probar audio, cambios de frecuencia y desconexión.
+
+## Antenas recomendadas para recibir FM sin Internet
+
+| Dispositivo | Antena recomendada | Qué más se necesita |
+| --- | --- | --- |
+| **Android con radio FM integrada y habilitada** | **Auriculares con cable de 3,5 mm**, que actúan como antena en los modelos compatibles; no sirven auriculares Bluetooth como antena. Un adaptador USB-C no garantiza que funcione. | Chip FM habilitado y una aplicación/controlador del fabricante. **FLCO aún no controla ese chip**. |
+| **Android con RTL-SDR externo** | **Dipolo telescópico VHF/FM** conectado al RTL-SDR, ajustado aproximadamente a 70–75 cm por brazo cerca de 100 MHz. | Adaptador USB-C OTG, alimentación USB suficiente, RTL-SDR y una app/controlador Android compatible. **FLCO Android solo detecta algunos receptores: aún no sintoniza audio**. |
+| **Portátil/PC con RTL-SDR USB** | **Dipolo telescópico VHF/FM**, aproximadamente 70–75 cm por brazo cerca de 100 MHz, preferiblemente junto a una ventana y lejos de interferencias. | RTL-SDR USB, `rtl_fm`, `ffmpeg` y `fm_server.py`. Es el modo FM experimental implementado en esta rama. |
+| **Portátil/PC, señal FM fuerte** | Antena telescópica de aproximadamente **75 cm** conectada al receptor SDR, si tiene conector y plano de tierra adecuados. | Receptor SDR: la antena Wi-Fi del portátil no sustituye al sintonizador FM. |
+| **iPhone/iPad** | No hay antena interna FM accesible universalmente a FLCO. | Un receptor externo y una integración nativa específica; **no implementado**. |
+
+Las medidas son orientativas: a 100 MHz, un cuarto de longitud de onda son unos **75 cm**, útil como longitud inicial de cada brazo de un dipolo de media onda o de un elemento vertical de cuarto de onda. Ajusta longitud, orientación y ubicación según la recepción. **La antena no proporciona Internet ni lo necesita**, pero sí requiere un receptor capaz de demodular FM.
+
+Referencias: [guía de antenas dipolo RTL-SDR](https://www.rtl-sdr.com/using-our-new-dipole-antenna-kit/), [Huawei: requisitos de auriculares y chip FM](https://consumer.huawei.com/ph/support/content/en-us15805916/).
+
+## Estado de las pruebas (sin hardware)
+
+Se ha revisado el código del servidor y el escáner Android. Se han añadido pruebas automáticas en `tests/test_fm_server.py` para validar frecuencias permitidas, entradas inválidas, dependencias y vinculación exclusiva a localhost. Ejecutar:
+
+```bash
+python3 -m unittest discover -s tests -p 'test_fm_server.py' -v
+python3 -m py_compile fm_server.py
+node --check web/fm.js
+```
+
+**No se han ejecutado todavía esas pruebas en un entorno local de este cambio ni se ha compilado la aplicación Android.** Tampoco se ha conectado un RTL-SDR real, verificado audio, realizado escaneo de emisoras FM por antena ni probado el receptor FM interno de teléfonos. Hasta completar esas comprobaciones, el soporte FM real debe considerarse **experimental, no verificado**. Detectar un dispositivo USB no equivale a recibir radio.
