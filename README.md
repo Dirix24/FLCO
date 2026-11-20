@@ -216,3 +216,15 @@ Para alojar **solo la radio web** (búsqueda y reproducción de emisoras por Int
 Para usar **FM real mediante RTL-SDR**, el alojamiento estático no basta: hay que ejecutar `python3 fm_server.py` en el equipo que tenga conectado el receptor USB y su antena. El servidor está limitado a `127.0.0.1`; **no expongas directamente sus endpoints de control de hardware a Internet**. La detección y recepción FM siguen siendo experimentales y no verificadas con hardware.
 
 Esta rama de publicación conserva los cambios anteriores de búsqueda por ubicación y exploración mundial filtrable, además del reproductor. La función de ubicación requiere permiso del navegador y no equivale a detectar señales RF.
+
+
+## Ubicación en teléfonos Android y iPhone
+
+El botón **«📍 Radios cerca de mí»** usa la API estándar de geolocalización del navegador. No depende de una marca concreta: puede funcionar en móviles Samsung, Xiaomi, Motorola, OPPO, realme, Google Pixel, iPhone y otros **si el dispositivo y el navegador proporcionan ubicación y el usuario autoriza el acceso**. No es posible garantizar que funcione en todos los modelos, versiones o navegadores. También funciona en portátiles compatibles.
+
+1. Abre FLCO desde una dirección **HTTPS**, como `https://dirix24.github.io/FLCO/`. Una página abierta por HTTP desde la IP local de otro equipo normalmente **no puede solicitar geolocalización**.
+2. Activa los servicios de **Ubicación/GPS** del teléfono. En iPhone revisa Ajustes → Privacidad y seguridad → Localización y el permiso de Safari; en Android revisa Ajustes → Ubicación y el permiso del navegador. Los nombres de menús varían según marca y versión.
+3. Pulsa **«Radios cerca de mí»** y concede permiso de ubicación al sitio. FLCO intenta primero una ubicación rápida; si falla por indisponibilidad o tiempo agotado, reintenta una vez con alta precisión y un tiempo de espera mayor.
+4. Si no se obtiene ubicación, usa la **búsqueda por país y género**, que no necesita permisos de GPS. Si el sitio está dentro de un iframe, la política de permisos del sitio anfitrión también puede bloquear geolocalización.
+
+La posición se utiliza para consultar emisoras **online** con coordenadas declaradas en el directorio, no para captar frecuencias FM cercanas. Se envían coordenadas al servicio de directorio al realizar la búsqueda. Requiere conexión a Internet y que las emisoras publiquen datos geográficos; la lista puede estar incompleta. No se almacena la ubicación en favoritos ni en almacenamiento local de FLCO. **No se ha probado en todas las marcas ni dispositivos reales.**
