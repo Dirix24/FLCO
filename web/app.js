@@ -58,13 +58,35 @@ function stationRow(station, target, favoriteMode = false, number = null) {
   actions.append(listen);
   const favorite = document.createElement("button");
   favorite.type = "button";
-  favorite.textContent = favoriteMode ? "Quitar" : "☆ Guardar";
+  favorite.classList.add("favorite-star");
+  favorite.dataset.stationUrl = station.url;
+  function updateFavoriteState(button) {
+    const saved = favorites.some(item => item.url === station.url);
+    button.classList.toggle("is-favorite", saved);
+    button.textContent = saved ? "★ Guardada" : "☆ Guardar";
+    button.setAttribute("aria-pressed", String(saved));
+    button.setAttribute("aria-label", saved ? "Quitar de favoritos" : "Guardar en favoritos");
+  }
+  updateFavoriteState(favorite);
   favorite.addEventListener("click", () => {
-    if (favoriteMode) favorites = favorites.filter(s => s.url !== station.url);
-    else if (!favorites.some(s => s.url === station.url)) favorites.push(station);
+    const wasSaved = favorites.some(item => item.url === station.url);
+    if (wasSaved) favorites = favorites.filter(item => item.url !== station.url);
+    else favorites.push(station);
     favorites = favorites.slice(-100);
     saveFavorites();
     renderFavorites();
+    document.querySelectorAll(".favorite-star").forEach(button => {
+      const saved = favorites.some(item => item.url === button.dataset.stationUrl);
+      button.classList.toggle("is-favorite", saved);
+      button.textContent = saved ? "★ Guardada" : "☆ Guardar";
+      button.setAttribute("aria-pressed", String(saved));
+      button.setAttribute("aria-label", saved ? "Quitar de favoritos" : "Guardar en favoritos");
+      if (!wasSaved && saved && button.dataset.stationUrl === station.url) {
+        button.classList.remove("favorite-flash");
+        void button.offsetWidth;
+        button.classList.add("favorite-flash");
+      }
+    });
   });
   actions.append(favorite);
   li.append(actions);
