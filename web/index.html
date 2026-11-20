@@ -37,10 +37,10 @@
 </section>
 <section class="panel">
 <h2>Sin Internet</h2>
-<p class="hint">Puedes abrir FLCO sin conexión después de cargarla una vez en este navegador. Para escuchar sin Internet, elige un archivo de audio que tengas en el dispositivo. Las emisoras de Internet y los favoritos necesitan conexión para reproducirse.</p>
+<p class="hint">Crea canales con tus archivos de audio y sintonízalos sin Internet, como una radio con dial. Los archivos se guardan en este navegador y pueden ocupar espacio. Las emisoras en directo por Internet no funcionan desconectado: recibir FM/AM real requiere un receptor físico compatible.</p>
 <label for="offline-file">Abrir audio del dispositivo</label>
-<input id="offline-file" type="file" accept="audio/*">
-<p id="offline-info" role="status" aria-live="polite">Ningún archivo seleccionado.</p>
+<input id="offline-file" type="file" accept="audio/*" multiple><button id="offline-mode" type="button">Sintonizar radio sin Internet</button><ul id="offline-stations" class="stations"></ul>
+<p id="offline-info" role="status" aria-live="polite">Importa música, programas o grabaciones que tengas derecho a utilizar.</p>
 </section>
 <section class="panel"><h2>Favoritos</h2><ul id="favorites" class="stations"></ul></section>
 <details class="panel"><summary>Opciones adicionales</summary>
