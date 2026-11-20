@@ -176,4 +176,14 @@ python3 -m py_compile fm_server.py
 node --check web/fm.js
 ```
 
-**No se han ejecutado todavía esas pruebas en un entorno local de este cambio ni se ha compilado la aplicación Android.** Tampoco se ha conectado un RTL-SDR real, verificado audio, realizado escaneo de emisoras FM por antena ni probado el receptor FM interno de teléfonos. Hasta completar esas comprobaciones, el soporte FM real debe considerarse **experimental, no verificado**. Detectar un dispositivo USB no equivale a recibir radio.
+**No se ha confirmado todavía la ejecución satisfactoria de esas pruebas ni la compilación Android.** Tampoco se ha conectado un RTL-SDR real, verificado audio, realizado escaneo de emisoras FM por antena ni probado el receptor FM interno de teléfonos. Hasta completar esas comprobaciones, el soporte FM real debe considerarse **experimental, no verificado**. Detectar un dispositivo USB no equivale a recibir radio.
+
+## Probar FLCO sin antena (simulación de audio)
+
+Abre la interfaz web y pulsa **«Probar sin antena (simulación)»** en **FM por antena**. FLCO genera un tono de prueba con Web Audio, sin Internet, receptor USB ni antena. Al cambiar la frecuencia, cambia el tono; los botones de navegación permiten recorrer el dial. Pulsa **«Detener FM»** para silenciarlo.
+
+**No es una emisora real**: el sonido es generado matemáticamente y no demuestra recepción de ondas, calidad de señal ni compatibilidad del móvil. El botón de recepción FM real permanece separado y solo se habilita si el servidor local detecta las herramientas de software necesarias (esto tampoco garantiza que exista hardware conectado).
+
+### Comprobaciones automáticas
+
+El flujo `.github/workflows/fm-checks.yml` ejecuta pruebas unitarias Python, sintaxis JavaScript y un intento de compilación Android en GitHub Actions al actualizar la rama. Los resultados de CI deben consultarse en la pestaña **Actions** del repositorio; **añadir el flujo no implica que haya pasado**. La prueba acústica del navegador y la recepción física requieren comprobación adicional.
