@@ -264,13 +264,30 @@ function distanceKm(lat1, lon1, lat2, lon2) {
   const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * rad) * Math.cos(lat2 * rad) * Math.sin(dLon / 2) ** 2;
   return 12742 * Math.asin(Math.min(1, Math.sqrt(a)));
 }
-$("nearby-radios").addEventListener("click", () => {
-  if (!navigator.geolocation) {
-    status("Este navegador no permite consultar la ubicación. Puedes buscar por país.");
+function locateDevice(options) {
+  return new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject, options));
+}
+$("nearby-radios").addEventListener("click", async () => {
+  if (!window.isSecureContext) {
+    status("Para usar la ubicación en el móvil, abre FLCO con HTTPS (no con una dirección HTTP de la red). Puedes buscar por país.");
     return;
   }
-  status("Solicitando ubicación para buscar emisoras online próximas…");
-  navigator.geolocation.getCurrentPosition(async position => {
+  if (!navigator.geolocation) {
+    status("Este navegador no admite geolocalización. Usa los filtros por país y género.");
+    return;
+  }
+  const button = $("nearby-radios");
+  button.disabled = true;
+  status("Solicitando permiso de ubicación del teléfono o portátil…");
+  try {
+    let position;
+    try {
+      position = await locateDevice({enableHighAccuracy: false, timeout: 20000, maximumAge: 600000});
+    } catch (error) {
+      if (error.code !== 2 && error.code !== 3) throw error;
+      status("Reintentando con GPS de alta precisión…");
+      position = await locateDevice({enableHighAccuracy: true, timeout: 25000, maximumAge: 0});
+    }
     if (currentRequest) currentRequest.abort();
     const request = new AbortController();
     currentRequest = request;
@@ -281,26 +298,26 @@ $("nearby-radios").addEventListener("click", () => {
     url.searchParams.set("geo_distance", "150000");
     url.searchParams.set("hidebroken", "true");
     url.searchParams.set("limit", "500");
-    try {
-      status("Buscando radios online con ubicación publicada…");
-      const response = await fetch(url, {signal: request.signal});
-      if (!response.ok) throw new Error("Directorio no disponible");
-      const rows = await response.json();
-      if (!Array.isArray(rows)) throw new Error("Respuesta inválida");
-      if (request !== currentRequest) return;
-      const nearby = rows.map(entry => {
-        const latitude = Number(entry.geo_lat), longitude = Number(entry.geo_long);
-        if (entry.geo_lat === null || entry.geo_long === null ||
-            !Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
-        return {entry, distance: distanceKm(lat, lon, latitude, longitude)};
-      }).filter(item => item && item.distance <= 150).sort((a,b) => a.distance - b.distance);
-      displayDirectory(nearby.map(item => item.entry), "emisoras publicadas a menos de 150 km");
-    } catch (error) {
-      if (error.name !== "AbortError" && request === currentRequest)
-        status("No se pudieron consultar radios cercanas. Prueba la búsqueda por país.");
-    }
-  }, error => {
-    status(error.code === 1 ? "Ubicación denegada. Puedes buscar por país."
-      : "No se pudo obtener la ubicación. Puedes buscar por país.");
-  }, {enableHighAccuracy: false, timeout: 12000, maximumAge: 300000});
+    status("Buscando emisoras online cercanas…");
+    const response = await fetch(url, {signal: request.signal});
+    if (!response.ok) throw new Error("Directorio no disponible");
+    const rows = await response.json();
+    if (!Array.isArray(rows)) throw new Error("Respuesta inválida");
+    if (request !== currentRequest) return;
+    const nearby = rows.map(entry => {
+      const latitude = Number(entry.geo_lat), longitude = Number(entry.geo_long);
+      if (entry.geo_lat == null || entry.geo_long == null ||
+          !Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
+      return {entry, distance: distanceKm(lat, lon, latitude, longitude)};
+    }).filter(item => item && item.distance <= 150).sort((a,b) => a.distance - b.distance);
+    displayDirectory(nearby.map(item => item.entry), "emisoras publicadas a menos de 150 km");
+  } catch (error) {
+    if (error.name === "AbortError") return;
+    if (error.code === 1) status("Permiso de ubicación denegado. Activa la ubicación para este sitio en los ajustes del navegador o busca por país.");
+    else if (error.code === 2) status("No se detectó tu posición. Activa la ubicación/GPS y prueba cerca de una ventana, o busca por país.");
+    else if (error.code === 3) status("El GPS tardó demasiado. Prueba con Wi-Fi y ubicación activados o busca por país.");
+    else status("No se pudieron cargar las emisoras cercanas. Comprueba Internet o busca por país.");
+  } finally {
+    button.disabled = false;
+  }
 });
