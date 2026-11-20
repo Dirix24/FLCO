@@ -7,6 +7,8 @@
   const tune = $("fm-tune");
   const stop = $("fm-stop");
   const demo = $("fm-demo");
+  const scan = $("fm-scan");
+  const scanResults = $("fm-scan-results");
   const local = location.hostname === "localhost" || location.hostname === "127.0.0.1";
   let mode = "none";
   let context = null;
@@ -101,6 +103,34 @@
   $("fm-down").addEventListener("click", () => step(-1));
   $("fm-up").addEventListener("click", () => step(1));
   tune.addEventListener("click", startReal);
+  scan.addEventListener("click", async () => {
+    if (!realAvailable) return;
+    scan.disabled = true;
+    scanResults.replaceChildren();
+    state.textContent = "Buscando señales de radio FM con RTL-SDR…";
+    try {
+      const response = await fetch("/api/fm/scan", {cache: "no-store"});
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Error de escaneo");
+      const candidates = Array.isArray(result.candidates_mhz) ? result.candidates_mhz : [];
+      state.textContent = candidates.length
+        ? candidates.length + " frecuencias candidatas detectadas; confirma cada emisora escuchándola."
+        : "No se detectaron señales destacadas. Comprueba la antena o vuelve a buscar.";
+      for (const candidate of candidates) {
+        const value = Number(candidate);
+        if (!Number.isFinite(value) || value < 87.5 || value > 108) continue;
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = value.toFixed(1) + " MHz · Probar";
+        button.addEventListener("click", () => { setFrequency(value); startReal(); });
+        scanResults.append(button, " ");
+      }
+    } catch (error) {
+      state.textContent = "No se pudo buscar: " + error.message;
+    } finally {
+      scan.disabled = !realAvailable;
+    }
+  });
   demo.addEventListener("click", startDemo);
   stop.addEventListener("click", () => {
     stopCurrent(true);
@@ -121,6 +151,7 @@
       const data = await response.json();
       realAvailable = !!data.available;
       tune.disabled = !realAvailable;
+      scan.disabled = !realAvailable;
       state.textContent = realAvailable
         ? "Herramientas FM instaladas (no confirma antena ni recepción). También puedes probar la simulación."
         : "Sin receptor confirmado: prueba la simulación. Para FM real instala rtl_fm y ffmpeg.";

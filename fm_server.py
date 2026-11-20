@@ -6,6 +6,9 @@ No utiliza Internet; sirve únicamente en 127.0.0.1.
 """
 import argparse
 import json
+import csv
+import io
+import statistics
 import shutil
 import subprocess
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -27,6 +30,47 @@ def parse_frequency(raw):
     return round(freq, 1)
 
 
+def scan_candidates():
+    """Return candidate FM frequencies from RTL-SDR power readings, not verified stations."""
+    if not shutil.which('rtl_power'):
+        raise RuntimeError('rtl_power no está instalado')
+    try:
+        result = subprocess.run(
+            ['rtl_power', '-f', '87.5M:108M:100k', '-i', '1', '-e', '3s', '-'],
+            capture_output=True, text=True, timeout=18, check=True
+        )
+    except (subprocess.TimeoutExpired, subprocess.CalledProcessError, OSError) as exc:
+        raise RuntimeError('No se pudo escanear el receptor RTL-SDR') from exc
+    readings = {}
+    for row in csv.reader(io.StringIO(result.stdout)):
+        if len(row) < 7:
+            continue
+        try:
+            start, end, step = map(float, row[2:5])
+            powers = [float(v) for v in row[6:] if v.strip()]
+        except ValueError:
+            continue
+        if step <= 0:
+            continue
+        for index, power in enumerate(powers):
+            frequency = (start + step * index) / 1e6
+            if 87.5 <= frequency <= 108 and -150 < power < 50:
+                key = round(frequency * 10) / 10
+                readings.setdefault(key, []).append(power)
+    if len(readings) < 10:
+        raise RuntimeError('No hay mediciones suficientes para identificar señales')
+    averaged = {freq: statistics.mean(values) for freq, values in readings.items()}
+    floor = statistics.median(averaged.values())
+    peaks = sorted(((power, freq) for freq, power in averaged.items() if power >= floor + 8), reverse=True)
+    selected = []
+    for power, freq in peaks:
+        if all(abs(freq - existing) >= 0.3 for existing in selected):
+            selected.append(freq)
+        if len(selected) == 25:
+            break
+    return sorted(selected)
+
+
 def receiver_available():
     return bool(shutil.which("rtl_fm") and shutil.which("ffmpeg"))
 
@@ -44,6 +88,18 @@ class Handler(SimpleHTTPRequestHandler):
                 "range_mhz": [MIN_FM, MAX_FM],
                 "message": "Conecta un RTL-SDR y su antena FM; se necesitan rtl_fm y ffmpeg."
             })
+            return
+        if parsed.path == "/api/fm/scan":
+            if not shutil.which("rtl_power"):
+                self.json_response(503, {"error": "Falta rtl_power (paquete rtl-sdr)"})
+                return
+            try:
+                candidates = scan_candidates()
+            except RuntimeError as error:
+                self.json_response(503, {"error": str(error)})
+                return
+            self.json_response(200, {"candidates_mhz": candidates, "verified": False,
+                                     "message": "Frecuencias candidatas por potencia RF; no se ha confirmado audio de emisoras."})
             return
         if parsed.path == "/api/fm/stream":
             try:
