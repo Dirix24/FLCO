@@ -70,3 +70,21 @@ main{max-width:920px;gap:1.1rem;padding:1.3rem}
 #results:empty{display:none}
 footer{max-width:920px;margin:auto;line-height:1.7}
 @media(max-width:600px){main{padding:.7rem;gap:.8rem}.panel{padding:1rem}.collapsible-panel{padding:.9rem}.dial-bars{height:55px}}
+
+/* Portada con navegación compacta, accesible y adaptable. */
+html{scroll-behavior:smooth;scroll-padding-top:1rem}
+.topbar{position:relative;max-width:none;gap:.8rem}
+.app-menu{margin-left:auto;position:relative;z-index:30;flex:none}
+.app-menu>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:.4rem;padding:.65rem .9rem;border:1px solid #8f855e;border-radius:12px;background:#15140f;color:#f4e5ab;font-weight:700;min-height:44px}
+.app-menu>summary::-webkit-details-marker{display:none}
+.app-menu>summary:focus-visible,.app-menu nav a:focus-visible{outline:3px solid var(--flco-accent);outline-offset:3px}
+.app-menu[open]>summary{background:#342d19}
+.app-menu nav{position:absolute;right:0;top:calc(100% + .5rem);width:min(330px,calc(100vw - 1.5rem));padding:.45rem;border:1px solid #8f855e;border-radius:14px;background:#12120f;box-shadow:0 16px 36px #000b;display:grid;gap:.2rem}
+.app-menu nav a{display:block;padding:.85rem .8rem;color:#f4f3ec;text-decoration:none;border-radius:9px;font-weight:550}
+.app-menu nav a:hover{background:#353021;color:#fff2bb}
+#buscar{border-color:#b7a565}
+#favoritos .stations:empty::before{content:"Tus emisoras guardadas aparecerán aquí";color:#bdb9a9}
+#radio-mundial .channel-nav{margin:.75rem 0}
+#radio-mundial .search-options{margin-top:.75rem}
+@media(max-width:600px){.topbar #connection-state{order:3;width:100%;margin-left:0}.app-menu{order:2}.topbar>div{flex:1}.app-menu>summary{padding:.6rem .75rem}#radio-mundial .channel-nav{flex-direction:column}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
