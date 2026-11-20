@@ -243,3 +243,10 @@ Al abrir FLCO, la portada muestra primero **Busca tu radio**, el reproductor **E
 
 
 **Versión identificada en la interfaz:** `0.1.0 (beta)`. Es una etiqueta inicial de esta rama para indicar que la web sigue en desarrollo; no corresponde a una publicación etiquetada o release verificada.
+
+
+## Catálogo mundial ampliado
+
+En **Radio mundial**, «Radios de todo el mundo» consulta Radio Browser por páginas de hasta **100 registros**. «Cargar más emisoras del mundo» solicita las páginas siguientes, sin el antiguo límite de 60 emisoras visibles. Los filtros por país y género reinician la lista. Se omiten URLs duplicadas y streams que no sean HTTPS.
+
+**No son todas las señales de radio físicas del mundo**: se muestran emisoras online incluidas en un directorio externo, que puede estar incompleto o tener enlaces caídos. La recepción FM/AM real requiere hardware y cobertura local. Esta función necesita Internet y no se ha verificado cada emisora.
