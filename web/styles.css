@@ -39,3 +39,14 @@ canvas{background:#050505;border:1px solid #8b8b82}
 .dial-bars i{background:var(--flco-accent);box-shadow:0 0 9px #e9dba066}
 footer{border-top:1px solid #66665f}
 @media(max-width:600px){.panel{border-left-width:2px}}
+
+.radio-filters{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:.6rem;margin:1rem 0;align-items:center}.radio-filters label{font-weight:600}.radio-filters input,.radio-filters select{min-width:0;width:100%;padding:.65rem;border-radius:8px;background:#080808;color:#fff;border:1px solid #aaa99e}.radio-filters button{grid-column:1/-1}.channel-nav{flex-wrap:wrap}@media(max-width:600px){.radio-filters{grid-template-columns:1fr}}
+
+/* Animación decorativa del dial mientras el reproductor emite audio. */
+.radio-dial.is-playing{border-color:#fff2bb;box-shadow:0 0 0 1px #e9dba077,0 0 24px #e9dba044}
+.radio-dial.is-playing .dial-bars i{transform-origin:center;animation:dial-pulse 1.1s ease-in-out infinite alternate;animation-delay:var(--bar-delay,0s)}
+.favorite-star{transition:background-color .22s,color .22s,box-shadow .22s,transform .22s}
+.favorite-star.is-favorite{background:#f7d54b;color:#241a00;border:1px solid #ffe994;box-shadow:0 0 12px #f7d54b88;font-weight:700}
+.favorite-star.favorite-flash{animation:favorite-light .55s ease-out}
+@keyframes favorite-light{0%{transform:scale(1);box-shadow:0 0 0 #f7d54b00}45%{transform:scale(1.1);box-shadow:0 0 22px #ffe57bbb}100%{transform:scale(1);box-shadow:0 0 12px #f7d54b88}}
+@media(prefers-reduced-motion:reduce){.radio-dial.is-playing .dial-bars i,.favorite-star.favorite-flash{animation:none}.favorite-star{transition:none}}

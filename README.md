@@ -1,5 +1,11 @@
 # FLCO · Radio de código abierto
 
+**Repositorio oficial:** https://github.com/Dirix24/FLCO  
+**Crear una copia para modificar o alojar:** https://github.com/Dirix24/FLCO/fork  
+**Descargar el código:** https://github.com/Dirix24/FLCO/archive/refs/heads/main.zip  
+**Sitio web (si está publicado):** https://dirix24.github.io/FLCO/
+
+
 FLCO es una radio web minimalista para escuchar emisoras públicas por Internet, buscar por país o género, guardar favoritos y cambiar entre **canales numerados 1, 2, 3, 4, 5…**. Tiene un dial de **barras azules animadas** y colores que cambian con cada emisora. Estas barras son **decorativas** y no pretenden medir ondas ni interferencias.
 
 **Proyecto desarrollado con asistencia de inteligencia artificial (IA)**, bajo dirección y revisión humana. El código fuente tiene **[licencia MIT](LICENSE)**, que permite usar, estudiar, modificar y redistribuir el software bajo sus condiciones. La licencia del código no concede derechos sobre las emisiones de terceros.
@@ -194,3 +200,19 @@ El flujo `.github/workflows/fm-checks.yml` ejecuta pruebas unitarias Python, sin
 Se conserva el **reproductor de emisoras por Internet**, la búsqueda por país, los favoritos y los **archivos locales sin Internet**. En la misma interfaz, el botón **«Buscar señales FM»** realiza un barrido físico de 87,5 a 108 MHz mediante `rtl_power` en un RTL-SDR USB conectado al ordenador. Muestra **frecuencias candidatas**, seleccionables para probar la recepción con `rtl_fm`; no confirma que cada pico corresponda a una emisora audible. La búsqueda necesita receptor SDR y antena adecuados, pero **no necesita Internet**. En teléfonos sin acceso a receptor FM, el navegador no puede hacer ese barrido. El modo de simulación sigue separado y no recibe radio.
 
 Para utilizarlo: instala `rtl-sdr` y `ffmpeg`, conecta RTL-SDR y antena FM, ejecuta `python3 fm_server.py` y abre `http://127.0.0.1:8000/`. **No se ha probado con hardware físico**; los resultados dependen de drivers, ganancia, antena e interferencias. El reproductor online sigue requiriendo Internet.
+
+
+## Radios cercanas y radios de todo el mundo
+
+La interfaz conserva el reproductor y añade **«📍 Radios cerca de mí»** y **«🌍 Radios de todo el mundo»**. El primero pide permiso de geolocalización **solo al pulsarlo** y consulta el directorio Radio Browser para listar emisoras online que declaren coordenadas a un máximo de 150 km; no mide cobertura, intensidad RF ni sintoniza la antena. Si se deniega el permiso, se puede buscar por país. El segundo permite filtrar por **país** y **género** (noticias, deportes, rock, jazz, etc.) y presenta hasta 60 resultados HTTPS del directorio; no pretende enumerar literalmente todas las emisoras existentes. **Ambos modos necesitan Internet** para consultar y reproducir las emisoras. La FM real sin Internet por RTL-SDR es una función distinta y experimental.
+
+
+## Reutilizar o alojar FLCO en tu propio servidor
+
+El código de FLCO está disponible en **https://github.com/Dirix24/FLCO** bajo licencia MIT. Puedes consultar la licencia completa en [LICENSE](LICENSE) y crear un [fork](https://github.com/Dirix24/FLCO/fork) para adaptarlo o alojarlo. Conserva los avisos de copyright y licencia requeridos; los enlaces y contenidos de emisoras ajenas no están cubiertos por la licencia del proyecto.
+
+Para alojar **solo la radio web** (búsqueda y reproducción de emisoras por Internet, favoritos, archivos locales y simulación) sirve el contenido de la carpeta `web/` mediante un servidor HTTPS, por ejemplo GitHub Pages, Netlify o un servidor web propio. El soporte offline de Service Worker requiere HTTPS o localhost, y una visita inicial para almacenar los recursos. El directorio de emisoras y los streams online requieren Internet.
+
+Para usar **FM real mediante RTL-SDR**, el alojamiento estático no basta: hay que ejecutar `python3 fm_server.py` en el equipo que tenga conectado el receptor USB y su antena. El servidor está limitado a `127.0.0.1`; **no expongas directamente sus endpoints de control de hardware a Internet**. La detección y recepción FM siguen siendo experimentales y no verificadas con hardware.
+
+Esta rama de publicación conserva los cambios anteriores de búsqueda por ubicación y exploración mundial filtrable, además del reproductor. La función de ubicación requiere permiso del navegador y no equivale a detectar señales RF.
