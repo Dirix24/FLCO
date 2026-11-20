@@ -35,7 +35,7 @@ function play(station) {
   player.src = url;
   player.load();
   const info = $("station-details");
-  if (info) info.textContent = [clean(station.category) || "Categoría no confirmada",clean(station.country),clean(station.codec) ? "Códec: " + station.codec : "",station.bitrate ? "Bitrate declarado: " + station.bitrate + " kbps" : ""].filter(Boolean).join(" · ") + " · Flujo: " + url + " · Estos datos son del directorio, no mediciones RF.";
+  if (info) info.textContent = [clean(station.category) || "Categoría no confirmada",clean(station.country),clean(station.codec) ? "Códec: " + station.codec : "",station.bitrate ? "Bitrate declarado: " + station.bitrate + " kbps" : "" ].filter(Boolean).join(" · ") || "Emisora en línea.";
   player.play().catch(() => status("Pulsa reproducir en el control de audio. Comprueba que el formato sea compatible."));
 }
 function stationRow(station, target, favoriteMode = false, number = null) {
