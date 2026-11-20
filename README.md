@@ -187,3 +187,10 @@ Abre la interfaz web y pulsa **«Probar sin antena (simulación)»** en **FM por
 ### Comprobaciones automáticas
 
 El flujo `.github/workflows/fm-checks.yml` ejecuta pruebas unitarias Python, sintaxis JavaScript y un intento de compilación Android en GitHub Actions al actualizar la rama. Los resultados de CI deben consultarse en la pestaña **Actions** del repositorio; **añadir el flujo no implica que haya pasado**. La prueba acústica del navegador y la recepción física requieren comprobación adicional.
+
+
+## Búsqueda de señales FM (rama experimental)
+
+Se conserva el **reproductor de emisoras por Internet**, la búsqueda por país, los favoritos y los **archivos locales sin Internet**. En la misma interfaz, el botón **«Buscar señales FM»** realiza un barrido físico de 87,5 a 108 MHz mediante `rtl_power` en un RTL-SDR USB conectado al ordenador. Muestra **frecuencias candidatas**, seleccionables para probar la recepción con `rtl_fm`; no confirma que cada pico corresponda a una emisora audible. La búsqueda necesita receptor SDR y antena adecuados, pero **no necesita Internet**. En teléfonos sin acceso a receptor FM, el navegador no puede hacer ese barrido. El modo de simulación sigue separado y no recibe radio.
+
+Para utilizarlo: instala `rtl-sdr` y `ffmpeg`, conecta RTL-SDR y antena FM, ejecuta `python3 fm_server.py` y abre `http://127.0.0.1:8000/`. **No se ha probado con hardware físico**; los resultados dependen de drivers, ganancia, antena e interferencias. El reproductor online sigue requiriendo Internet.
