@@ -90,3 +90,5 @@ html{scroll-behavior:smooth;scroll-padding-top:1rem}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 
 .app-version{margin:.2rem 0 .8rem;color:var(--flco-accent);font-size:.82rem;font-weight:700;letter-spacing:.04em}
+
+#world-more{display:block;margin:1rem auto;width:min(100%,360px);border:1px solid var(--flco-accent)}#world-more[hidden]{display:none}
