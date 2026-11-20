@@ -3,7 +3,7 @@
 **Repositorio oficial:** https://github.com/Dirix24/FLCO  
 **Crear una copia para modificar o alojar:** https://github.com/Dirix24/FLCO/fork  
 **Descargar el código:** https://github.com/Dirix24/FLCO/archive/refs/heads/main.zip  
-**Sitio web (si está publicado):** https://dirix24.github.io/FLCO/
+**Abrir FLCO Radio:** https://dirix24.github.io/FLCO/web/
 
 
 FLCO es una radio web minimalista para escuchar emisoras públicas por Internet, buscar por país o género, guardar favoritos y cambiar entre **canales numerados 1, 2, 3, 4, 5…**. Tiene un dial de **barras azules animadas** y colores que cambian con cada emisora. Estas barras son **decorativas** y no pretenden medir ondas ni interferencias.
@@ -222,9 +222,16 @@ Esta rama de publicación conserva los cambios anteriores de búsqueda por ubica
 
 El botón **«📍 Radios cerca de mí»** usa la API estándar de geolocalización del navegador. No depende de una marca concreta: puede funcionar en móviles Samsung, Xiaomi, Motorola, OPPO, realme, Google Pixel, iPhone y otros **si el dispositivo y el navegador proporcionan ubicación y el usuario autoriza el acceso**. No es posible garantizar que funcione en todos los modelos, versiones o navegadores. También funciona en portátiles compatibles.
 
-1. Abre FLCO desde una dirección **HTTPS**, como `https://dirix24.github.io/FLCO/`. Una página abierta por HTTP desde la IP local de otro equipo normalmente **no puede solicitar geolocalización**.
+1. Abre FLCO desde una dirección **HTTPS**, como `https://dirix24.github.io/FLCO/web/`. Una página abierta por HTTP desde la IP local de otro equipo normalmente **no puede solicitar geolocalización**.
 2. Activa los servicios de **Ubicación/GPS** del teléfono. En iPhone revisa Ajustes → Privacidad y seguridad → Localización y el permiso de Safari; en Android revisa Ajustes → Ubicación y el permiso del navegador. Los nombres de menús varían según marca y versión.
 3. Pulsa **«Radios cerca de mí»** y concede permiso de ubicación al sitio. FLCO intenta primero una ubicación rápida; si falla por indisponibilidad o tiempo agotado, reintenta una vez con alta precisión y un tiempo de espera mayor.
 4. Si no se obtiene ubicación, usa la **búsqueda por país y género**, que no necesita permisos de GPS. Si el sitio está dentro de un iframe, la política de permisos del sitio anfitrión también puede bloquear geolocalización.
 
 La posición se utiliza para consultar emisoras **online** con coordenadas declaradas en el directorio, no para captar frecuencias FM cercanas. Se envían coordenadas al servicio de directorio al realizar la búsqueda. Requiere conexión a Internet y que las emisoras publiquen datos geográficos; la lista puede estar incompleta. No se almacena la ubicación en favoritos ni en almacenamiento local de FLCO. **No se ha probado en todas las marcas ni dispositivos reales.**
+
+
+## Interfaz más sencilla (rama experimental)
+
+La página principal prioriza **Buscar radios** y **Escuchar**. Los filtros de país y género se abren con «Filtrar por país y género»; las opciones de **Audio sin Internet** y **FM por antena (avanzado)** están plegadas inicialmente para reducir ruido visual, pero siguen disponibles. Se mantienen la búsqueda cercana, la exploración mundial, el reproductor, favoritos, los controles del dial y los enlaces al repositorio. Los cambios visuales aún requieren comprobación en dispositivos reales.
+
+**Dirección de la página:** https://dirix24.github.io/FLCO/web/
