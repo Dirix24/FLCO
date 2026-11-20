@@ -40,11 +40,6 @@
   addEventListener("offline", connection);
   connection();
 
-  $("back-button").addEventListener("click", () => {
-    if (history.length > 1) history.back();
-    else { window.scrollTo({top: 0, behavior: "smooth"}); $("query").focus(); }
-  });
-
   function revoke() {
     if (objectUrl) URL.revokeObjectURL(objectUrl);
     objectUrl = null;
