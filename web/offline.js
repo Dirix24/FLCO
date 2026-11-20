@@ -6,6 +6,7 @@
   let dbPromise;
   let tracks = [];
   let activeIndex = -1;
+  let activeTrackId = null;
   let offlineMode = false;
   let objectUrl = null;
   const player = $("player");
@@ -50,6 +51,7 @@
   }
   async function refresh() {
     tracks = await transaction("readonly", store => store.getAll());
+    activeIndex = activeTrackId === null ? -1 : tracks.findIndex(track => track.id === activeTrackId);
     const list = $("offline-stations");
     list.replaceChildren();
     if (!tracks.length) {
@@ -76,6 +78,7 @@
           player.load();
           revoke();
           activeIndex = -1;
+          activeTrackId = null;
         }
         try { await transaction("readwrite", store => store.delete(track.id)); await refresh(); info.textContent = "Canal eliminado."; }
         catch { info.textContent = "No se pudo eliminar el canal."; }
@@ -89,7 +92,9 @@
     activeIndex = (index + tracks.length) % tracks.length;
     const track = tracks[activeIndex];
     if (!track.blob) { info.textContent = "El archivo no está disponible."; return; }
+    document.dispatchEvent(new Event("flco:offline-play"));
     offlineMode = true;
+    activeTrackId = track.id;
     player.pause();
     revoke();
     objectUrl = URL.createObjectURL(track.blob);
@@ -121,6 +126,7 @@
   });
   $("offline-mode").addEventListener("click", () => playLocal(activeIndex < 0 ? 0 : activeIndex));
   document.addEventListener("flco:station", () => { offlineMode = false; revoke(); });
+  document.addEventListener("flco:fm-play", () => { offlineMode = false; revoke(); });
   window.FLCOOffline = {
     active: () => offlineMode,
     step: delta => playLocal((activeIndex < 0 ? 0 : activeIndex + delta))
