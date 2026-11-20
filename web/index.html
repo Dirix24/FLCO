@@ -13,7 +13,7 @@
 <meta property="og:image" content="https://dirix24.github.io/FLCO/favicon.svg">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"FLCO Radio","url":"https://dirix24.github.io/FLCO/","description":"FLCO Radio: escucha emisoras de radio por Internet, busca por país o género, cambia entre canales numerados y guarda tus favoritas. Software libre."}</script>
 <link rel="stylesheet" href="styles.css">
-<script src="app.js" defer></script><script src="dial.js" defer></script><script src="offline.js" defer></script>
+<script src="fm.js" defer></script><script src="app.js" defer></script><script src="dial.js" defer></script><script src="offline.js" defer></script>
 </head>
 <body>
 <header class="topbar"><button id="back-button" type="button" aria-label="Volver a la página anterior">← Volver</button><div><h1>📻 FLCO Radio</h1><p>Radio de código abierto · MIT</p></div><span id="connection-state" role="status">Comprobando conexión…</span></header>
@@ -37,12 +37,12 @@
 </section>
 <section class="panel">
 <h2>Sin Internet</h2>
-<p class="hint">Puedes abrir FLCO sin conexión después de cargarla una vez en este navegador. Para escuchar sin Internet, elige un archivo de audio que tengas en el dispositivo. Las emisoras de Internet y los favoritos necesitan conexión para reproducirse.</p>
+<p class="hint">Crea canales con tus archivos de audio y sintonízalos sin Internet, como una radio con dial. Los archivos se guardan en este navegador y pueden ocupar espacio. Las emisoras en directo por Internet no funcionan desconectado: recibir FM/AM real requiere un receptor físico compatible.</p>
 <label for="offline-file">Abrir audio del dispositivo</label>
-<input id="offline-file" type="file" accept="audio/*">
-<p id="offline-info" role="status" aria-live="polite">Ningún archivo seleccionado.</p>
+<input id="offline-file" type="file" accept="audio/*" multiple><button id="offline-mode" type="button">Sintonizar radio sin Internet</button><ul id="offline-stations" class="stations"></ul>
+<p id="offline-info" role="status" aria-live="polite">Importa música, programas o grabaciones que tengas derecho a utilizar.</p>
 </section>
-<section class="panel"><h2>Favoritos</h2><ul id="favorites" class="stations"></ul></section>
+<section class="panel" id="fm-panel"><h2>FM por antena (RTL-SDR USB)</h2><p class="hint">Simulación de tonos sin antena y sin Internet; no recibe emisoras. Recepción FM real sin Internet, disponible solo al ejecutar el servidor local con un receptor RTL-SDR compatible. La antena Wi-Fi del portátil no sirve como receptor FM y los chips FM internos de móviles no son accesibles desde esta web.</p><label for="fm-frequency">Frecuencia FM: <strong id="fm-frequency-label">99.5 MHz</strong></label><input id="fm-frequency" type="range" min="87.5" max="108" step="0.1" value="99.5"><div class="channel-nav"><button type="button" id="fm-down">− 0,1 MHz</button><button type="button" id="fm-up">+ 0,1 MHz</button><button type="button" id="fm-tune" disabled>Sintonizar FM</button><button type="button" id="fm-demo">Probar sin antena (simulación)</button><button type="button" id="fm-stop">Detener FM</button></div><p id="fm-status" role="status" aria-live="polite">Preparando sintonizador…</p></section><section class="panel"><h2>Favoritos</h2><ul id="favorites" class="stations"></ul></section>
 <details class="panel"><summary>Opciones adicionales</summary>
 <form id="url-form"><label for="station-name">Nombre de la radio</label><input id="station-name" maxlength="100" placeholder="Mi radio" required><label for="station-url">Enlace de audio HTTPS</label><input id="station-url" type="url" placeholder="https://ejemplo.org/radio.mp3" required><button type="submit">Escuchar enlace</button></form>
 </details>

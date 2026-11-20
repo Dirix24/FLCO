@@ -4,13 +4,13 @@ FLCO es una radio web minimalista para escuchar emisoras públicas por Internet,
 
 **Proyecto desarrollado con asistencia de inteligencia artificial (IA)**, bajo dirección y revisión humana. El código fuente tiene **[licencia MIT](LICENSE)**, que permite usar, estudiar, modificar y redistribuir el software bajo sus condiciones. La licencia del código no concede derechos sobre las emisiones de terceros.
 
-> Estado: prototipo web en desarrollo. La rama `feature/flco-numbered-radio-dial` no está fusionada con `main`. Las funciones nuevas requieren pruebas manuales en los navegadores de destino.
+> Estado: prototipo web en desarrollo. Los canales locales persistentes están propuestos en la rama `feat/flco-radio-offline-presets` (PR #22), todavía sin fusionar con `main` ni verificar en dispositivos reales.
 
 ## Qué puedes hacer
 
 - **Con Internet:** buscar emisoras por país, nombre o tema; escucharlas si el flujo es compatible; ver nombre, país, categoría, códec y bitrate cuando el directorio los proporciona; guardar favoritos.
 - **Cambiar de canal:** pulsa el número de una emisora o los botones **Anterior** y **Siguiente**. El dial cambia de color y anima barras azules cuando suena el reproductor.
-- **Sin Internet:** abrir la interfaz desde su caché tras una primera visita compatible y reproducir **archivos de audio locales** con el selector de archivos. Los favoritos guardan enlaces, no grabaciones; las emisoras de Internet **no funcionan offline**.
+- **Sin Internet (rama experimental):** abrir la interfaz desde su caché tras una primera visita compatible, importar varios archivos de audio y guardarlos en el almacenamiento local del navegador (IndexedDB). Esos archivos se convierten en **canales numerados** que puedes recorrer con **Anterior** y **Siguiente**, incluso tras recargar, mientras el navegador conserve los datos. Los favoritos de emisoras online solo guardan enlaces: **no funcionan offline**. La disponibilidad depende del espacio y las políticas de almacenamiento del navegador.
 - **Móvil:** interfaz adaptable y controles táctiles. La reproducción depende del navegador y el formato.
 
 No se muestran ya los gráficos de ondas de audio que fallaban, la televisión ni los paneles de simulación.
@@ -27,7 +27,7 @@ sudo apt install git python3
 git clone https://github.com/Dirix24/FLCO.git
 cd FLCO
 git fetch origin
-git switch --track origin/feature/flco-numbered-radio-dial
+git switch --track origin/feat/flco-radio-offline-presets
 python3 -m http.server 8000 --directory web
 ```
 
@@ -36,7 +36,7 @@ Si ya tienes el repositorio:
 ```bash
 cd ~/FLCO
 git fetch origin
-git switch --track origin/feature/flco-numbered-radio-dial
+git switch --track origin/feat/flco-radio-offline-presets
 python3 -m http.server 8000 --directory web
 ```
 
@@ -48,7 +48,7 @@ Abre **http://localhost:8000**. Si ya estabas en otra rama de FLCO, guarda prime
 git clone https://github.com/Dirix24/FLCO.git
 cd FLCO
 git fetch origin
-git switch --track origin/feature/flco-numbered-radio-dial
+git switch --track origin/feat/flco-radio-offline-presets
 py -3 -m http.server 8000 --directory web
 ```
 
@@ -60,7 +60,7 @@ Abre **http://localhost:8000** en Edge o Firefox. Si `py` no existe, prueba `pyt
 git clone https://github.com/Dirix24/FLCO.git
 cd FLCO
 git fetch origin
-git switch --track origin/feature/flco-numbered-radio-dial
+git switch --track origin/feat/flco-radio-offline-presets
 python3 -m http.server 8000 --directory web
 ```
 
@@ -81,7 +81,7 @@ Si cuentan con navegador moderno y un servidor HTTP que sirva la carpeta `web`, 
 3. En los resultados numerados pulsa **1, 2, 3…** o **Escuchar**.
 4. Cambia de emisora con **Anterior** o **Siguiente**. Los colores y barras cambian con el canal; no indican intensidad RF.
 5. Usa **☆ Guardar** para favoritos y **← Volver** para regresar.
-6. Sin Internet, abre la página previamente guardada y elige un **archivo de audio local**. La escucha de emisoras online requiere Internet.
+6. En la rama experimental, importa archivos desde **Sin Internet** para guardarlos como canales locales. Desconecta Internet, vuelve a abrir la web ya cacheada y usa **Sintonizar radio sin Internet** o **Anterior/Siguiente**. Los canales locales reproducen archivos guardados, no emisiones FM en directo.
 
 ## ¿Qué antena necesito?
 
@@ -89,11 +89,13 @@ Si cuentan con navegador moderno y un servidor HTTP que sirva la carpeta `web`, 
 | --- | --- |
 | Escuchar emisoras por Internet | **Ninguna antena de radio**; solo conexión Wi-Fi, Ethernet o datos móviles |
 | Reproducir audio local sin Internet | **Ninguna antena** |
-| Recibir radio FM real (87,5–108 MHz) sin Internet | **Receptor RTL-SDR USB** compatible y antena telescópica o dipolo ajustado a la banda FM |
+| Radio FM en teléfono con receptor FM integrado | Algunos teléfonos incluyen chip/receptor FM y pueden utilizar los auriculares con cable como antena; depende del modelo, firmware, controladores y una aplicación nativa compatible. **FLCO web no puede acceder directamente a ese receptor desde el navegador** |
+| Radio FM en portátil | La antena Wi-Fi/Bluetooth del portátil **no es un receptor FM/AM**. La mayoría de portátiles no incorporan sintonizador de radio. Para recibir FM sin Internet se necesita un receptor compatible (por ejemplo RTL-SDR USB) y antena adecuada |
+| Recibir radio FM real (87,5–108 MHz) sin Internet | **Receptor RTL-SDR USB** compatible y antena telescópica o dipolo ajustado a la banda FM; el software de recepción aún debe integrarse |
 | Mejorar recepción FM débil | Antena exterior para banda FM, ubicación despejada y cable coaxial adecuado |
 | Explorar otras bandas con SDR | Antena diseñada para la banda de frecuencia que quieras recibir; verifica legalidad y compatibilidad |
 
-**Importante:** la interfaz web todavía **no** controla el RTL-SDR ni reproduce FM por antena. El repositorio conserva un script Python separado `opensdr_explorer.py` para explorar espectro con hardware compatible, pero no sustituye a un receptor FM completo. Una antena sola no basta.
+**Objetivo de FLCO:** aprovechar un receptor FM integrado del teléfono cuando el dispositivo y una integración nativa lo permitan, o un receptor SDR compatible conectado al portátil. **En la rama experimental ya existe un servidor local para RTL-SDR USB en portátiles/PC**, pero el acceso a chips FM integrados de teléfonos todavía no está implementado. El navegador no ofrece acceso universal a la antena/chip FM del móvil, y las antenas de Wi-Fi de los portátiles no sintonizan emisoras FM por sí solas. Para radio real sin Internet se necesita **receptor + antena + software/controladores**; no basta con la antena. La rama experimental incluye `fm_server.py`, que usa `rtl_fm` y `ffmpeg` para entregar audio FM al navegador local. `opensdr_explorer.py` sigue disponible como explorador separado. El receptor RTL-SDR, su antena y los controladores deben funcionar en el equipo. **No se ha probado aún con hardware real.**
 
 ## Desinstalar
 
@@ -122,8 +124,66 @@ node --check web/offline.js
 node --check web/sw.js
 ```
 
-Las comprobaciones de sintaxis no garantizan la reproducción de todas las radios. El directorio externo puede estar caído y los flujos pueden requerir formatos no admitidos. El modo offline depende de que el navegador haya guardado la interfaz. Los archivos locales no se suben a un servidor.
+Las comprobaciones de sintaxis no garantizan la reproducción de todas las radios. El directorio externo puede estar caído y los flujos pueden requerir formatos no admitidos. El modo offline depende de que el navegador haya guardado la interfaz. Los archivos locales no se suben a un servidor; en la rama experimental se guardan en IndexedDB y pueden perderse si el usuario borra los datos del sitio o el navegador libera almacenamiento. La función de recepción FM/AM mediante hardware está pendiente de implementación y pruebas.
 
 ## Licencia, autoría y privacidad
 
 **Código abierto MIT. Desarrollado con asistencia de IA.** Consulta [LICENSE](LICENSE). Los favoritos se guardan localmente en el navegador. Las búsquedas online se envían a Radio Browser. FLCO no necesita permisos de geolocalización para el buscador actual. Los contenidos de terceros conservan sus licencias y condiciones.
+
+## FM real sin Internet (experimental, Linux con RTL-SDR USB)
+
+Este modo recibe ondas FM reales mediante un **receptor RTL-SDR USB y una antena FM**, sin utilizar Internet. La web por sí sola no puede captar radio. El servidor local escucha únicamente en `127.0.0.1` y sirve la interfaz y el audio desde el mismo ordenador.
+
+Instala las herramientas (la instalación de paquetes puede necesitar Internet una vez):
+
+```bash
+sudo apt install rtl-sdr ffmpeg
+```
+
+Conecta el RTL-SDR USB y la antena FM. Desde la carpeta FLCO en la rama experimental:
+
+```bash
+python3 fm_server.py
+```
+
+Abre **http://127.0.0.1:8000/** en el mismo equipo, busca la sección **FM por antena**, selecciona una frecuencia entre 87,5 y 108 MHz y pulsa **Sintonizar FM**. Los botones **Anterior** y **Siguiente** permiten ajustar la frecuencia en pasos de 0,1 MHz mientras se escucha FM.
+
+**Requisitos y límites:** se necesitan `rtl_fm`, `ffmpeg` con codificador `libmp3lame`, un dispositivo RTL-SDR compatible y permisos de acceso USB. Algunos equipos requieren configurar reglas udev o descargar un controlador que esté ocupando el dispositivo. La recepción puede fallar si no hay antena o señal. Solo se ha implementado FM de radiodifusión, no AM. Este servidor no da acceso remoto ni puede utilizar el receptor FM integrado de un móvil. No se ha verificado aún la calidad del audio ni la compatibilidad de todos los modelos.
+
+Comprobaciones sin antena: `python3 -m py_compile fm_server.py`, `node --check web/fm.js`. Para verificar recepción real, hay que conectar hardware y probar audio, cambios de frecuencia y desconexión.
+
+## Antenas recomendadas para recibir FM sin Internet
+
+| Dispositivo | Antena recomendada | Qué más se necesita |
+| --- | --- | --- |
+| **Android con radio FM integrada y habilitada** | **Auriculares con cable de 3,5 mm**, que actúan como antena en los modelos compatibles; no sirven auriculares Bluetooth como antena. Un adaptador USB-C no garantiza que funcione. | Chip FM habilitado y una aplicación/controlador del fabricante. **FLCO aún no controla ese chip**. |
+| **Android con RTL-SDR externo** | **Dipolo telescópico VHF/FM** conectado al RTL-SDR, ajustado aproximadamente a 70–75 cm por brazo cerca de 100 MHz. | Adaptador USB-C OTG, alimentación USB suficiente, RTL-SDR y una app/controlador Android compatible. **FLCO Android solo detecta algunos receptores: aún no sintoniza audio**. |
+| **Portátil/PC con RTL-SDR USB** | **Dipolo telescópico VHF/FM**, aproximadamente 70–75 cm por brazo cerca de 100 MHz, preferiblemente junto a una ventana y lejos de interferencias. | RTL-SDR USB, `rtl_fm`, `ffmpeg` y `fm_server.py`. Es el modo FM experimental implementado en esta rama. |
+| **Portátil/PC, señal FM fuerte** | Antena telescópica de aproximadamente **75 cm** conectada al receptor SDR, si tiene conector y plano de tierra adecuados. | Receptor SDR: la antena Wi-Fi del portátil no sustituye al sintonizador FM. |
+| **iPhone/iPad** | No hay antena interna FM accesible universalmente a FLCO. | Un receptor externo y una integración nativa específica; **no implementado**. |
+
+Las medidas son orientativas: a 100 MHz, un cuarto de longitud de onda son unos **75 cm**, útil como longitud inicial de cada brazo de un dipolo de media onda o de un elemento vertical de cuarto de onda. Ajusta longitud, orientación y ubicación según la recepción. **La antena no proporciona Internet ni lo necesita**, pero sí requiere un receptor capaz de demodular FM.
+
+Referencias: [guía de antenas dipolo RTL-SDR](https://www.rtl-sdr.com/using-our-new-dipole-antenna-kit/), [Huawei: requisitos de auriculares y chip FM](https://consumer.huawei.com/ph/support/content/en-us15805916/).
+
+## Estado de las pruebas (sin hardware)
+
+Se ha revisado el código del servidor y el escáner Android. Se han añadido pruebas automáticas en `tests/test_fm_server.py` para validar frecuencias permitidas, entradas inválidas, dependencias y vinculación exclusiva a localhost. Ejecutar:
+
+```bash
+python3 -m unittest discover -s tests -p 'test_fm_server.py' -v
+python3 -m py_compile fm_server.py
+node --check web/fm.js
+```
+
+**No se ha confirmado todavía la ejecución satisfactoria de esas pruebas ni la compilación Android.** Tampoco se ha conectado un RTL-SDR real, verificado audio, realizado escaneo de emisoras FM por antena ni probado el receptor FM interno de teléfonos. Hasta completar esas comprobaciones, el soporte FM real debe considerarse **experimental, no verificado**. Detectar un dispositivo USB no equivale a recibir radio.
+
+## Probar FLCO sin antena (simulación de audio)
+
+Abre la interfaz web y pulsa **«Probar sin antena (simulación)»** en **FM por antena**. FLCO genera un tono de prueba con Web Audio, sin Internet, receptor USB ni antena. Al cambiar la frecuencia, cambia el tono; los botones de navegación permiten recorrer el dial. Pulsa **«Detener FM»** para silenciarlo.
+
+**No es una emisora real**: el sonido es generado matemáticamente y no demuestra recepción de ondas, calidad de señal ni compatibilidad del móvil. El botón de recepción FM real permanece separado y solo se habilita si el servidor local detecta las herramientas de software necesarias (esto tampoco garantiza que exista hardware conectado).
+
+### Comprobaciones automáticas
+
+El flujo `.github/workflows/fm-checks.yml` ejecuta pruebas unitarias Python, sintaxis JavaScript y un intento de compilación Android en GitHub Actions al actualizar la rama. Los resultados de CI deben consultarse en la pestaña **Actions** del repositorio; **añadir el flujo no implica que haya pasado**. La prueba acústica del navegador y la recepción física requieren comprobación adicional.
