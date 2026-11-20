@@ -20,6 +20,6 @@
  });
  $("player").addEventListener("pause",()=>$("radio-dial").classList.remove("is-playing"));
  $("player").addEventListener("play",()=>$("radio-dial").classList.add("is-playing"));
- $("prev-station").addEventListener("click",()=>window.FLCOOffline?.active()?window.FLCOOffline.step(-1):window.FLCOStations?.step(-1));
- $("next-station").addEventListener("click",()=>window.FLCOOffline?.active()?window.FLCOOffline.step(1):window.FLCOStations?.step(1));
+ $("prev-station").addEventListener("click",()=>window.FLCOFM?.active()?window.FLCOFM.step(-1):window.FLCOOffline?.active()?window.FLCOOffline.step(-1):window.FLCOStations?.step(-1));
+ $("next-station").addEventListener("click",()=>window.FLCOFM?.active()?window.FLCOFM.step(1):window.FLCOOffline?.active()?window.FLCOOffline.step(1):window.FLCOStations?.step(1));
 })();
