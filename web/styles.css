@@ -50,3 +50,23 @@ footer{border-top:1px solid #66665f}
 .favorite-star.favorite-flash{animation:favorite-light .55s ease-out}
 @keyframes favorite-light{0%{transform:scale(1);box-shadow:0 0 0 #f7d54b00}45%{transform:scale(1.1);box-shadow:0 0 22px #ffe57bbb}100%{transform:scale(1);box-shadow:0 0 12px #f7d54b88}}
 @media(prefers-reduced-motion:reduce){.radio-dial.is-playing .dial-bars i,.favorite-star.favorite-flash{animation:none}.favorite-star{transition:none}}
+
+/* Interfaz menos saturada: la búsqueda y el reproductor son prioritarios. */
+main{max-width:920px;gap:1.1rem;padding:1.3rem}
+.panel{padding:1.4rem;border:1px solid #49483e;border-left:1px solid #49483e;border-radius:18px}
+.panel h2{font-size:1.12rem;margin-bottom:1rem}
+.panel .hint{font-size:.86rem}
+.search-options{margin:.85rem 0;border-top:1px solid #39382f;padding-top:.75rem}
+.search-options summary,.collapsible-panel summary{cursor:pointer;font-weight:650;color:var(--flco-accent);list-style-position:inside}
+.search-options[open] summary,.collapsible-panel[open] summary{margin-bottom:.9rem}
+.collapsible-panel{padding:1.05rem 1.4rem}
+.collapsible-panel summary{font-size:1.07rem}
+#listen-panel{border-color:#c1ae70;background:#10100d}
+#now-playing{font-weight:650;font-size:1.07rem}
+.radio-dial{margin:.65rem 0;padding:.8rem}
+.dial-bars{height:65px;margin:.45rem 0}
+#status:empty{display:none}
+#status{margin-top:.8rem}
+#results:empty{display:none}
+footer{max-width:920px;margin:auto;line-height:1.7}
+@media(max-width:600px){main{padding:.7rem;gap:.8rem}.panel{padding:1rem}.collapsible-panel{padding:.9rem}.dial-bars{height:55px}}

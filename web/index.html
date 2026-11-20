@@ -4,14 +4,14 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#000000"><title>FLCO Radio · Emisoras online de todo el mundo</title>
 <meta name="description" content="FLCO Radio: escucha emisoras de radio por Internet, busca por país o género, cambia entre canales numerados y guarda tus favoritas. Software libre.">
-<link rel="canonical" href="https://dirix24.github.io/FLCO/">
+<link rel="canonical" href="https://dirix24.github.io/FLCO/web/">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta property="og:type" content="website"><meta property="og:site_name" content="FLCO Radio">
 <meta property="og:title" content="FLCO Radio · Emisoras online">
 <meta property="og:description" content="FLCO Radio: escucha emisoras de radio por Internet, busca por país o género, cambia entre canales numerados y guarda tus favoritas. Software libre.">
 <meta property="og:url" content="https://dirix24.github.io/FLCO/">
-<meta property="og:image" content="https://dirix24.github.io/FLCO/favicon.svg">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"FLCO Radio","url":"https://dirix24.github.io/FLCO/","description":"FLCO Radio: escucha emisoras de radio por Internet, busca por país o género, cambia entre canales numerados y guarda tus favoritas. Software libre."}</script>
+<meta property="og:image" content="https://dirix24.github.io/FLCO/web/favicon.svg">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"FLCO Radio","url":"https://dirix24.github.io/FLCO/web/","description":"FLCO Radio: escucha emisoras de radio por Internet, busca por país o género, cambia entre canales numerados y guarda tus favoritas. Software libre."}</script>
 <link rel="stylesheet" href="styles.css">
 <script src="fm.js" defer></script><script src="app.js" defer></script><script src="dial.js" defer></script><script src="offline.js" defer></script>
 </head>
@@ -21,8 +21,8 @@
 <section class="panel">
 <h2>Buscar radios</h2>
 <form id="search-form"><label for="query">País, noticias, música, deportes o nombre</label><div class="horizontal"><input id="query" type="search" placeholder="País" maxlength="100" required><button type="submit">Buscar</button></div></form>
-<p class="hint">Las emisoras se escuchan por Internet. Puedes elegir cualquier país escribiendo su nombre.</p><div class="channel-nav"><button id="nearby-radios" type="button">📍 Radios cerca de mí</button><button id="world-radios" type="button">🌍 Radios de todo el mundo</button></div><p class="hint">La ubicación se solicita solo al pulsar «Radios cerca de mí». Muestra emisoras online con coordenadas publicadas, no señales FM captadas por antena.</p><div class="radio-filters"><label for="world-country">País</label><input id="world-country" type="text" placeholder="Todos los países" maxlength="100"><label for="world-genre">Género</label><select id="world-genre"><option value="">Todos los géneros</option><option value="news">Noticias</option><option value="talk">Conversación</option><option value="sports">Deportes</option><option value="music">Música</option><option value="pop">Pop</option><option value="rock">Rock</option><option value="jazz">Jazz</option><option value="classical">Clásica</option><option value="electronic">Electrónica</option><option value="latin">Latina</option><option value="ambient">Ambient</option></select><button id="apply-world-filters" type="button">Aplicar filtros</button></div>
-<div id="status" role="status" aria-live="polite"></div><p class="hint">Las emisoras aparecen numeradas. Pulsa un número o usa Anterior y Siguiente.</p><ul id="results" class="stations"></ul>
+<div class="channel-nav"><button id="nearby-radios" type="button">📍 Radios cerca de mí</button><button id="world-radios" type="button">🌍 Radios de todo el mundo</button></div><details class="search-options"><summary>Filtrar por país y género</summary><div class="radio-filters"><label for="world-country">País</label><input id="world-country" type="text" placeholder="Todos los países" maxlength="100"><label for="world-genre">Género</label><select id="world-genre"><option value="">Todos los géneros</option><option value="news">Noticias</option><option value="talk">Conversación</option><option value="sports">Deportes</option><option value="music">Música</option><option value="pop">Pop</option><option value="rock">Rock</option><option value="jazz">Jazz</option><option value="classical">Clásica</option><option value="electronic">Electrónica</option><option value="latin">Latina</option><option value="ambient">Ambient</option></select><button id="apply-world-filters" type="button">Aplicar filtros</button></div></details>
+<div id="status" role="status" aria-live="polite"></div><ul id="results" class="stations"></ul>
 </section>
 <section class="panel" id="listen-panel">
 <h2>Escuchar</h2><p id="now-playing">Selecciona una emisora o un archivo local</p>
@@ -31,18 +31,17 @@
 <div class="radio-dial" id="radio-dial" aria-label="Animación decorativa de la radio">
 <div class="dial-heading"><strong id="dial-number">CANAL —</strong><span id="dial-mode">Radio lista</span></div>
 <div class="dial-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-<p class="hint">Barras y colores decorativos que cambian con la emisora. No representan ondas ni intensidad de señal.</p>
+
 </div>
 <div class="channel-nav"><button id="prev-station" type="button">← Anterior</button><button id="next-station" type="button">Siguiente →</button></div>
 </section>
-<section class="panel">
-<h2>Sin Internet</h2>
-<p class="hint">Crea canales con tus archivos de audio y sintonízalos sin Internet, como una radio con dial. Los archivos se guardan en este navegador y pueden ocupar espacio. Las emisoras en directo por Internet no funcionan desconectado: recibir FM/AM real requiere un receptor físico compatible.</p>
+<details class="panel collapsible-panel"><summary>Audio sin Internet</summary>
+<p class="hint">Importa tus archivos para escucharlos sin conexión.</p>
 <label for="offline-file">Abrir audio del dispositivo</label>
 <input id="offline-file" type="file" accept="audio/*" multiple><button id="offline-mode" type="button">Sintonizar radio sin Internet</button><ul id="offline-stations" class="stations"></ul>
 <p id="offline-info" role="status" aria-live="polite">Importa música, programas o grabaciones que tengas derecho a utilizar.</p>
-</section>
-<section class="panel" id="fm-panel"><h2>FM por antena (RTL-SDR USB)</h2><p class="hint">Simulación de tonos sin antena y sin Internet; no recibe emisoras. Recepción FM real sin Internet, disponible solo al ejecutar el servidor local con un receptor RTL-SDR compatible. La antena Wi-Fi del portátil no sirve como receptor FM y los chips FM internos de móviles no son accesibles desde esta web.</p><label for="fm-frequency">Frecuencia FM: <strong id="fm-frequency-label">99.5 MHz</strong></label><input id="fm-frequency" type="range" min="87.5" max="108" step="0.1" value="99.5"><div class="channel-nav"><button type="button" id="fm-down">− 0,1 MHz</button><button type="button" id="fm-up">+ 0,1 MHz</button><button type="button" id="fm-tune" disabled>Sintonizar FM</button><button type="button" id="fm-scan" disabled>Buscar señales FM</button><button type="button" id="fm-demo">Probar sin antena (simulación)</button><button type="button" id="fm-stop">Detener FM</button></div><p id="fm-status" role="status" aria-live="polite">Preparando sintonizador…</p><div id="fm-scan-results" aria-live="polite"></div></section><section class="panel"><h2>Favoritos</h2><ul id="favorites" class="stations"></ul></section>
+</details>
+<details class="panel collapsible-panel" id="fm-panel"><summary>FM por antena (avanzado)</summary><p class="hint">Para FM real necesitas un receptor RTL-SDR USB, antena y servidor local. La simulación no recibe emisoras.</p><label for="fm-frequency">Frecuencia FM: <strong id="fm-frequency-label">99.5 MHz</strong></label><input id="fm-frequency" type="range" min="87.5" max="108" step="0.1" value="99.5"><div class="channel-nav"><button type="button" id="fm-down">− 0,1 MHz</button><button type="button" id="fm-up">+ 0,1 MHz</button><button type="button" id="fm-tune" disabled>Sintonizar FM</button><button type="button" id="fm-scan" disabled>Buscar señales FM</button><button type="button" id="fm-demo">Probar sin antena (simulación)</button><button type="button" id="fm-stop">Detener FM</button></div><p id="fm-status" role="status" aria-live="polite">Preparando sintonizador…</p><div id="fm-scan-results" aria-live="polite"></div></details><section class="panel"><h2>Favoritos</h2><ul id="favorites" class="stations"></ul></section>
 <details class="panel"><summary>Opciones adicionales</summary>
 <form id="url-form"><label for="station-name">Nombre de la radio</label><input id="station-name" maxlength="100" placeholder="Mi radio" required><label for="station-url">Enlace de audio HTTPS</label><input id="station-url" type="url" placeholder="https://ejemplo.org/radio.mp3" required><button type="submit">Escuchar enlace</button></form>
 </details>
