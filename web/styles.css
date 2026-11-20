@@ -88,3 +88,5 @@ html{scroll-behavior:smooth;scroll-padding-top:1rem}
 #radio-mundial .search-options{margin-top:.75rem}
 @media(max-width:600px){.topbar #connection-state{order:3;width:100%;margin-left:0}.app-menu{order:2}.topbar>div{flex:1}.app-menu>summary{padding:.6rem .75rem}#radio-mundial .channel-nav{flex-direction:column}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+.app-version{margin:.2rem 0 .8rem;color:var(--flco-accent);font-size:.82rem;font-weight:700;letter-spacing:.04em}
