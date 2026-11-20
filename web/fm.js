@@ -45,6 +45,7 @@
   }
   function startDemo() {
     stopCurrent(true);
+    document.dispatchEvent(new Event("flco:fm-play"));
     // Señal acústica local: NO hay captura RF ni estaciones reales.
     player.pause();
     player.removeAttribute("src");
@@ -74,6 +75,7 @@
   function startReal() {
     if (!realAvailable) { state.textContent = "Receptor real no disponible. Puedes usar la simulación."; return; }
     stopCurrent(true);
+    document.dispatchEvent(new Event("flco:fm-play"));
     const value = setFrequency(freq.value);
     player.pause();
     player.src = "/api/fm/stream?freq=" + encodeURIComponent(value.toFixed(1));
