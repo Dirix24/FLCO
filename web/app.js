@@ -181,3 +181,104 @@ $("player").addEventListener("error", () => status("No se puede reproducir este 
 renderFavorites();
 
 window.FLCOStations = {step(delta) {if (!stationList.length) {status("Busca primero emisoras para cambiar de canal.");return;} const next=(activeStationIndex+delta+stationList.length)%stationList.length;play(stationList[next]);}, current(){return activeStationIndex;}};
+
+
+/* Exploración mundial y radios online próximas: la ubicación nunca se pide automáticamente. */
+function stationFromDirectory(entry) {
+  const url = safeStream(entry.url_resolved || entry.url);
+  if (!url) return null;
+  return {name: clean(entry.name), url, country: clean(entry.country),
+    tags: clean(entry.tags), category: category(entry), codec: clean(entry.codec),
+    bitrate: Number(entry.bitrate) || 0};
+}
+function displayDirectory(rows, label) {
+  const unique = new Map();
+  for (const entry of rows) {
+    const station = stationFromDirectory(entry);
+    if (station && !unique.has(station.url)) unique.set(station.url, station);
+  }
+  stationList = [...unique.values()].slice(0, 60);
+  activeStationIndex = -1;
+  const target = $("results");
+  target.replaceChildren();
+  stationList.forEach((station, index) => stationRow(station, target, false, index + 1));
+  status(stationList.length
+    ? stationList.length + " emisoras online · " + label + ". No es recepción FM por antena."
+    : "No se encontraron emisoras online HTTPS para " + label + ".");
+}
+async function exploreWorld() {
+  if (currentRequest) currentRequest.abort();
+  const request = new AbortController();
+  currentRequest = request;
+  status("Consultando emisoras de todo el mundo…");
+  const country = clean($("world-country").value);
+  const genre = $("world-genre").value;
+  const url = new URL(DIRECTORY);
+  if (country) url.searchParams.set("country", country);
+  if (genre) url.searchParams.set("tag", genre);
+  url.searchParams.set("hidebroken", "true");
+  url.searchParams.set("limit", "100");
+  url.searchParams.set("order", "votes");
+  url.searchParams.set("reverse", "true");
+  try {
+    const response = await fetch(url, {signal: request.signal});
+    if (!response.ok) throw new Error("Directorio no disponible");
+    const rows = await response.json();
+    if (!Array.isArray(rows)) throw new Error("Respuesta inválida");
+    if (request !== currentRequest) return;
+    displayDirectory(rows, [country || "todos los países", genre || "todos los géneros"].join(" · "));
+  } catch (error) {
+    if (error.name !== "AbortError" && request === currentRequest)
+      status("No se pudo cargar el directorio mundial. Comprueba la conexión.");
+  }
+}
+$("world-radios").addEventListener("click", exploreWorld);
+$("apply-world-filters").addEventListener("click", exploreWorld);
+
+function distanceKm(lat1, lon1, lat2, lon2) {
+  const rad = Math.PI / 180;
+  const dLat = (lat2 - lat1) * rad;
+  const dLon = (lon2 - lon1) * rad;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * rad) * Math.cos(lat2 * rad) * Math.sin(dLon / 2) ** 2;
+  return 12742 * Math.asin(Math.min(1, Math.sqrt(a)));
+}
+$("nearby-radios").addEventListener("click", () => {
+  if (!navigator.geolocation) {
+    status("Este navegador no permite consultar la ubicación. Puedes buscar por país.");
+    return;
+  }
+  status("Solicitando ubicación para buscar emisoras online próximas…");
+  navigator.geolocation.getCurrentPosition(async position => {
+    if (currentRequest) currentRequest.abort();
+    const request = new AbortController();
+    currentRequest = request;
+    const lat = position.coords.latitude, lon = position.coords.longitude;
+    const url = new URL(DIRECTORY);
+    url.searchParams.set("geo_lat", String(lat));
+    url.searchParams.set("geo_long", String(lon));
+    url.searchParams.set("geo_distance", "150000");
+    url.searchParams.set("hidebroken", "true");
+    url.searchParams.set("limit", "500");
+    try {
+      status("Buscando radios online con ubicación publicada…");
+      const response = await fetch(url, {signal: request.signal});
+      if (!response.ok) throw new Error("Directorio no disponible");
+      const rows = await response.json();
+      if (!Array.isArray(rows)) throw new Error("Respuesta inválida");
+      if (request !== currentRequest) return;
+      const nearby = rows.map(entry => {
+        const latitude = Number(entry.geo_lat), longitude = Number(entry.geo_long);
+        if (entry.geo_lat === null || entry.geo_long === null ||
+            !Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
+        return {entry, distance: distanceKm(lat, lon, latitude, longitude)};
+      }).filter(item => item && item.distance <= 150).sort((a,b) => a.distance - b.distance);
+      displayDirectory(nearby.map(item => item.entry), "emisoras publicadas a menos de 150 km");
+    } catch (error) {
+      if (error.name !== "AbortError" && request === currentRequest)
+        status("No se pudieron consultar radios cercanas. Prueba la búsqueda por país.");
+    }
+  }, error => {
+    status(error.code === 1 ? "Ubicación denegada. Puedes buscar por país."
+      : "No se pudo obtener la ubicación. Puedes buscar por país.");
+  }, {enableHighAccuracy: false, timeout: 12000, maximumAge: 300000});
+});
