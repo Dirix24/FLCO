@@ -240,3 +240,6 @@ La página principal prioriza **Buscar radios** y **Escuchar**. Los filtros de p
 ## Menú principal y portada moderna (rama experimental)
 
 Al abrir FLCO, la portada muestra primero **Busca tu radio**, el reproductor **Escuchar** y **Tus radios favoritas**. El botón **☰ Menú** en la cabecera da acceso a **Buscar radios**, **Favoritas**, **Radio mundial**, **Sin Internet**, **FM por antena (RTL-SDR USB)** y **Opciones adicionales**. Los enlaces del menú navegan a las secciones y abren automáticamente las opciones plegadas; el menú se cierra al elegir una sección, pulsar Escape o hacer clic fuera. La búsqueda mundial conserva los filtros de país y género, y todas las funciones existentes siguen en la página. El menú funciona con teclado y pantallas móviles. Pendiente de pruebas visuales en dispositivos reales.
+
+
+**Versión identificada en la interfaz:** `0.1.0 (beta)`. Es una etiqueta inicial de esta rama para indicar que la web sigue en desarrollo; no corresponde a una publicación etiquetada o release verificada.
