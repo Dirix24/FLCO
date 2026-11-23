@@ -99,15 +99,55 @@ function renderFavorites() {
   favorites.forEach(station => stationRow(station, target, true));
 }
 // Interpretación local y explícita de términos habituales; sin IA ni envío de ubicación.
-const COUNTRIES = [
-  ["españa", "Spain"], ["espana", "Spain"], ["spain", "Spain"],
-  ["méxico", "Mexico"], ["mexico", "Mexico"], ["argentina", "Argentina"],
-  ["colombia", "Colombia"], ["chile", "Chile"], ["perú", "Peru"],
-  ["peru", "Peru"], ["venezuela", "Venezuela"], ["ecuador", "Ecuador"],
-  ["uruguay", "Uruguay"], ["bolivia", "Bolivia"], ["paraguay", "Paraguay"],
-  ["cuba", "Cuba"], ["estados unidos", "United States"], ["usa", "United States"],
-  ["francia", "France"], ["portugal", "Portugal"], ["alemania", "Germany"]
-];
+const normalize = s => clean(s).toLocaleLowerCase("es").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+const COUNTRY_CODES = new Set(`
+  AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ BA BB BD BE
+  BF BG BH BI BJ BL BM BN BO BQ BR BS BT BV BW BY BZ CA CC CD
+  CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM
+  DO DZ EC EE EG EH ER ES ET FI FJ FK FM FO FR GA GB GD GE GF
+  GG GH GI GL GM GN GP GQ GR GS GT GU GW GY HK HM HN HR HT HU
+  ID IE IL IM IN IO IQ IR IS IT JE JM JO JP KE KG KH KI KM KN
+  KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME
+  MF MG MH MK ML MM MN MO MP MQ MR MS MT MU MV MW MX MY MZ NA
+  NC NE NF NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM
+  PN PR PS PT PW PY QA RE RO RS RU RW SA SB SC SD SE SG SH SI
+  SJ SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TF TG TH TJ TK
+  TL TM TN TO TR TT TV TW TZ UA UG UM US UY UZ VA VC VE VG VI
+  VN VU WF WS XK YE YT ZA ZM ZW
+`.trim().split(/\s+/));
+const spanishRegions = typeof Intl.DisplayNames === "function"
+  ? new Intl.DisplayNames("es", {type: "region", fallback: "none"}) : null;
+const COUNTRY_ALIASES = new Map([
+  ["usa", "US"], ["uk", "GB"], ["reino unido", "GB"]
+]);
+const COUNTRY_NAMES = new Map(COUNTRY_ALIASES);
+if (typeof Intl.DisplayNames === "function") {
+  const locales = new Set(["es", "en", ...(navigator.languages || [])]);
+  for (const locale of locales) {
+    const names = new Intl.DisplayNames(locale, {type: "region", fallback: "none"});
+    for (const code of COUNTRY_CODES) {
+      const name = names.of(code);
+      if (name) COUNTRY_NAMES.set(normalize(name), code);
+    }
+  }
+} else {
+  for (const [name, code] of [
+    ["espana", "ES"], ["spain", "ES"], ["mexico", "MX"], ["argentina", "AR"],
+    ["colombia", "CO"], ["chile", "CL"], ["peru", "PE"], ["venezuela", "VE"],
+    ["ecuador", "EC"], ["uruguay", "UY"], ["bolivia", "BO"], ["paraguay", "PY"],
+    ["cuba", "CU"], ["estados unidos", "US"], ["francia", "FR"], ["portugal", "PT"],
+    ["alemania", "DE"]
+  ]) COUNTRY_NAMES.set(name, code);
+}
+const COUNTRY_PHRASES = [...COUNTRY_NAMES].sort(([a], [b]) => b.length - a.length);
+const FLAG_PATTERN = /[\u{1F1E6}-\u{1F1FF}]{2}/gu;
+function flagCode(flag) {
+  return [...flag].map(letter => String.fromCharCode(letter.codePointAt(0) - 0x1F1E6 + 65)).join("");
+}
+function countryCode(value) {
+  if (/^[A-Za-z]{2}$/.test(value) && COUNTRY_CODES.has(value.toUpperCase())) return value.toUpperCase();
+  return COUNTRY_NAMES.get(normalize(value));
+}
 const TOPICS = [
   {words: ["noticias", "noticia", "informativos", "informacion", "actualidad"], tags: ["news", "talk"] , label: "Noticias"},
   {words: ["deportes", "deporte", "futbol", "fútbol", "sports"], tags: ["sports", "sport"], label: "Deportes"},
@@ -118,15 +158,21 @@ const TOPICS = [
   {words: ["pop"], tags: ["pop"], label: "Pop"},
   {words: ["electronica", "electrónica"], tags: ["electronic"], label: "Electrónica"}
 ];
-const normalize = s => clean(s).toLocaleLowerCase("es").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 function interpretQuery(query) {
-  let rest = normalize(query).replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
-  let country = "";
-  const countryMatch = [...COUNTRIES].sort((a,b) => b[0].length-a[0].length)
-    .find(([word]) => new RegExp("(^| )" + normalize(word) + "( |$)").test(rest));
-  if (countryMatch) {
-    country = countryMatch[1];
-    rest = rest.replace(new RegExp("(^| )" + normalize(countryMatch[0]) + "(?= |$)"), " ").trim();
+  const flags = [...query.matchAll(FLAG_PATTERN)].map(([flag]) => flagCode(flag));
+  const hasInvalidFlag = flags.some(code => !COUNTRY_CODES.has(code)) || new Set(flags).size > 1;
+  let rest = normalize(query.replace(FLAG_PATTERN, " ")).replace(/[^\p{L}\p{N}\s]/gu, " ").replace(/\s+/g, " ").trim();
+  const exactCountry = COUNTRY_NAMES.get(normalize(query));
+  let country = flags[0] || exactCountry || "";
+  if (exactCountry) {
+    rest = "";
+  } else if (!country) {
+    const padded = " " + rest + " ";
+    const match = COUNTRY_PHRASES.find(([word]) => padded.includes(" " + word + " "));
+    if (match) {
+      country = match[1];
+      rest = padded.replace(" " + match[0] + " ", " ").trim();
+    }
   }
   let topic = null;
   for (const entry of TOPICS) {
@@ -138,7 +184,7 @@ function interpretQuery(query) {
     }
   }
   rest = rest.replace(/^(de|del|en|la|el|las|los)\s+/, "").trim();
-  return {country, topic, name: rest};
+  return {country, topic, name: rest, hasInvalidFlag};
 }
 function category(station) {
   const tags = normalize(station.tags || "").split(",").map(s=>s.trim());
@@ -152,20 +198,25 @@ $("search-form").addEventListener("submit", async (event) => {
   event.preventDefault();
   const query = clean($("query").value);
   if (!query) return;
+  const {country, topic, name, hasInvalidFlag} = interpretQuery(query);
+  if (hasInvalidFlag || (!country && !topic && !name)) {
+    status("Escribe un nombre o usa una sola bandera de país válida, como 🇪🇸.");
+    return;
+  }
+  $("world-more").hidden = true;
   if (currentRequest) currentRequest.abort();
   const request = new AbortController();
   currentRequest = request;
   const target = $("results");
   target.replaceChildren();
   status("Buscando emisoras...");
-  const {country, topic, name} = interpretQuery(query);
   try {
     // Radio Browser permite filtrar por país y etiqueta; probamos etiquetas alternativas.
     const tags = topic ? topic.tags : [""];
     const unique = new Map();
     for (const tag of tags) {
       const url = new URL(DIRECTORY);
-      if (country) url.searchParams.set("country", country);
+      if (country) url.searchParams.set("countrycode", country);
       if (tag) url.searchParams.set("tag", tag);
       if (name) url.searchParams.set("name", name);
       url.searchParams.set("hidebroken", "true");
@@ -189,7 +240,7 @@ $("search-form").addEventListener("submit", async (event) => {
     stationList = playable;
     activeStationIndex = -1;
     playable.forEach((s,i) => stationRow(s, target, false, i+1));
-    const description = [topic?.label, country || null, name || null].filter(Boolean).join(" · ") || query;
+    const description = [topic?.label, country ? (spanishRegions?.of(country) || country) : null, name || null].filter(Boolean).join(" · ") || query;
     status(playable.length ? `${playable.length} emisoras para «${description}». Las categorías proceden de etiquetas del directorio y pueden ser inexactas.` : "No hay emisoras HTTPS para esta búsqueda. Prueba otro país, género o nombre.");
   } catch (error) {
     if (error.name !== "AbortError" && request === currentRequest) status("No se pudo consultar el directorio. Prueba de nuevo o introduce una URL propia.");
@@ -232,21 +283,29 @@ let worldOffset = 0;
 let worldQuery = null;
 const WORLD_PAGE_SIZE = 100;
 async function exploreWorld(loadMore = false) {
+  if (!loadMore) {
+    const country = clean($("world-country").value);
+    const flags = [...country.matchAll(FLAG_PATTERN)];
+    const code = flags.length ? flagCode(flags[0][0]) : countryCode(country);
+    if (flags.length && (country !== flags[0][0] || !COUNTRY_CODES.has(code))) {
+      status("Escribe un país o usa una sola bandera válida, como 🇲🇽.");
+      return;
+    }
+    worldOffset = 0;
+    worldQuery = {country, code, genre: $("world-genre").value};
+    stationList = [];
+    $("results").replaceChildren();
+  }
   if (currentRequest) currentRequest.abort();
   const request = new AbortController();
   currentRequest = request;
   const button = $("world-more");
-  if (!loadMore) {
-    worldOffset = 0;
-    worldQuery = {country: clean($("world-country").value), genre: $("world-genre").value};
-    stationList = [];
-    $("results").replaceChildren();
-  }
   button.hidden = true;
   status(loadMore ? "Cargando más emisoras mundiales…" : "Consultando el catálogo mundial de emisoras online…");
-  const {country, genre} = worldQuery;
+  const {country, code, genre} = worldQuery;
   const url = new URL(DIRECTORY);
-  if (country) url.searchParams.set("country", country);
+  if (code) url.searchParams.set("countrycode", code);
+  else if (country) url.searchParams.set("country", country);
   if (genre) url.searchParams.set("tag", genre);
   url.searchParams.set("hidebroken", "true");
   url.searchParams.set("limit", String(WORLD_PAGE_SIZE));
