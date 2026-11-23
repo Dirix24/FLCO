@@ -5,6 +5,21 @@
   const selector = document.getElementById("page-translation");
   const message = document.getElementById("translation-status");
 
+  const panel = document.getElementById("idioma");
+  const shortcut = document.getElementById("language-button");
+
+  shortcut?.addEventListener("click", () => {
+    panel.open = true;
+    panel.scrollIntoView({block: "start"});
+    const languages = selector.querySelector("select");
+    if (button.hidden && languages) {
+      languages.focus();
+    } else {
+      panel.querySelector("summary").focus({preventScroll: true});
+      if (!button.disabled) button.click();
+    }
+  });
+
   button.addEventListener("click", () => {
     button.disabled = true;
     message.textContent = "Cargando idiomas… / Loading languages…";

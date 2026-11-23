@@ -89,7 +89,7 @@ Si cuentan con navegador moderno y un servidor HTTP que sirva la carpeta `web`, 
 5. Usa **☆ Guardar** para favoritos y **← Volver** para regresar.
 6. En la rama experimental, importa archivos desde **Sin Internet** para guardarlos como canales locales. Desconecta Internet, vuelve a abrir la web ya cacheada y usa **Sintonizar radio sin Internet** o **Anterior/Siguiente**. Los canales locales reproducen archivos guardados, no emisiones FM en directo.
 
-Para traducir la página, abre **Menú → Idioma / Language → Elegir idioma** y selecciona un idioma disponible. La traducción automática de Google requiere conexión a Internet. Si el selector no carga, la misma sección ofrece un enlace para abrir Google Translate.
+Para traducir la página, pulsa **🌐 Idioma / Language** en la cabecera y selecciona un idioma disponible. La traducción automática de Google requiere conexión a Internet. Si el selector no carga, la misma sección ofrece un enlace para abrir Google Translate.
 
 ## ¿Qué antena necesito?
 
