@@ -83,11 +83,13 @@ Si cuentan con navegador moderno y un servidor HTTP que sirva la carpeta `web`, 
 ## Uso diario
 
 1. Arranca el servidor y abre FLCO.
-2. Escribe un país, «noticias», «música» o el nombre de una emisora y pulsa **Buscar**.
+2. Escribe un país, su bandera (🇪🇸), un género o el nombre de una emisora y pulsa **Buscar**. Puedes combinar bandera y género, por ejemplo «🇫🇷 jazz». El filtro de **Radio mundial** también acepta banderas.
 3. En los resultados numerados pulsa **1, 2, 3…** o **Escuchar**.
 4. Cambia de emisora con **Anterior** o **Siguiente**. Los colores y barras cambian con el canal; no indican intensidad RF.
 5. Usa **☆ Guardar** para favoritos y **← Volver** para regresar.
 6. En la rama experimental, importa archivos desde **Sin Internet** para guardarlos como canales locales. Desconecta Internet, vuelve a abrir la web ya cacheada y usa **Sintonizar radio sin Internet** o **Anterior/Siguiente**. Los canales locales reproducen archivos guardados, no emisiones FM en directo.
+
+Para traducir la página, abre **Menú → Idioma / Language → Elegir idioma** y selecciona un idioma disponible. La traducción automática de Google requiere conexión a Internet. Si el selector no carga, la misma sección ofrece un enlace para abrir Google Translate.
 
 ## ¿Qué antena necesito?
 
